@@ -8,7 +8,10 @@ Control an addressable LED strip with an ESP8266 via a web browser or infrared r
 Purpose
 -------
 
-This is a humble rewrite attempt of "FastLED + ESP8266 Web Server" by Jason Coon.
+This is a humble rewrite attempt of FastLED + ESP8266 Web Server by Jason Coon: https://github.com/jasoncoon/esp8266-fastled-webserver
+
+It also includes ColorWavesWithPalettes by Mark Kriegsman: https://gist.github.com/kriegsman/8281905786e8b2632aeb
+
 
 The original code relied on the regular WebServer package for the ESP, which as you probably know, doesn't play really well if you query it too frequently...
 
