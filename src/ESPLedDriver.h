@@ -11,7 +11,7 @@
 FASTLED_USING_NAMESPACE
 
 
-#define DATA_PIN      2     // for Huzzah: Pins w/o special function:  #4, #5, #12, #13, #14; // #16 does not work :(
+  #define DATA_PIN      2     // for Huzzah: Pins w/o special function:  #4, #5, #12, #13, #14; // #16 does not work :(
   #define LED_TYPE      WS2811
   #define COLOR_ORDER   GRB
   #define NUM_LEDS      64
@@ -23,6 +23,9 @@ FASTLED_USING_NAMESPACE
   //#define FRAMES_PER_SECOND  speed // here you can control the speed. With the Access Point / Web Server the animations run a bit slower.
 
   #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
+
+
+
 
 
   class ESPLedDriver
@@ -92,8 +95,18 @@ FASTLED_USING_NAMESPACE
 
     CRGB _solidColor = CRGB::Blue;
 
-    uint8_t _patternCount = 4;
+    // uint8_t _patternCount = 4;
     void loadSettings();
+
+
+// [this](AsyncWebServerRequest *request)
+    typedef void (*Pattern)();
+    typedef Pattern PatternList[];
+    typedef struct {
+      Pattern pattern;
+      String name;
+    } PatternAndName;
+    typedef PatternAndName PatternAndNameList[];
 
     /* Animations */
     void showSolidColor();
@@ -108,13 +121,9 @@ FASTLED_USING_NAMESPACE
     void colorwaves();
     void palettetest();
 
-    typedef void (*Pattern)();
-    typedef Pattern PatternList[];
-    typedef struct {
-      Pattern pattern;
-      String name;
-    } PatternAndName;
-    typedef PatternAndName PatternAndNameList[];
+    PatternAndNameList _patterns;
+    uint8_t _patternCount;
+  // uint8_t _patternCount = 4;
 
     // List of patterns to cycle through.  Each is defined as a separate function below.
     // PatternAndNameList patterns = {
@@ -131,7 +140,7 @@ FASTLED_USING_NAMESPACE
     // };
 
     // const uint8_t patternCount = ARRAY_SIZE(patterns);
-
+    void setPatterns();
 
   };
 

@@ -207,7 +207,27 @@ void ESPLedDriver::setPattern(int value)
 /*
 animations
 */
+void ESPLedDriver::setPatterns()
+{
+  // const uint8_t patternCount;
+  PatternAndNameList patterns = {
 
+    // no luck: src/ESPLedDriver.cpp:225:3: error: cannot convert 'ESPLedDriver::colorwaves' from type 'void (ESPLedDriver::)()' to type 'ESPLedDriver::Pattern {aka void (*)()}'
+    { colorwaves, "Color Waves" },
+
+    // no luck: src/ESPLedDriver.cpp:225:3: error: cannot convert 'ESPLedDriver::palettetest' from type 'void (ESPLedDriver::)()' to type 'ESPLedDriver::Pattern {aka void (*)()}'
+    { this->palettetest, "Palette Test" },
+
+    // { this->pride, "Pride" },
+    // { this->rainbow, "Rainbow" },
+    // { this->rainbowWithGlitter, "Rainbow With Glitter" },
+    // { this->confetti, "Confetti" },
+    // { this->sinelon, "Sinelon" },
+    // { this->juggle, "Juggle" },
+    // { this->bpm, "BPM" },
+    // { this->showSolidColor, "Solid Color" },
+  };
+}
 void ESPLedDriver::showSolidColor()
 {
   fill_solid(_leds, NUM_LEDS, _solidColor);
