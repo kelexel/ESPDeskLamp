@@ -1,6 +1,6 @@
-.DS_Store
 .pioenvs
 .clang_complete
 .gcc-flags.json
+.DS_Store
 .piolibdeps
 src/_trash

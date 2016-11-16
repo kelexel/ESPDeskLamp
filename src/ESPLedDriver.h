@@ -69,9 +69,7 @@ FASTLED_USING_NAMESPACE
 
     int _framesPerSecond = 100;
     int _secondsPerPalette = 120;
-
     ///////////////////////////////////////////////////////////////////////
-
     // Forward declarations of an array of cpt-city gradient palettes, and
     // a count of how many there are.  The actual color palette definitions
     // are at the bottom of this file.
