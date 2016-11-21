@@ -1,12 +1,14 @@
 
-#ifndef PIXELS_H
-#define PIXELS_H
+#ifndef ESPLEDRIVER_H
+#define ESPLEDRIVER_H
 
 #define FASTLED_FORCE_SOFTWARE_SPI
 #define FASTLED_ALLOW_INTERRUPTS 0
 //#define FASTLED_ESP8266_RAW_PIN_ORDER
+#include <Arduino.h>
 #include <EEPROM.h>
 #include "FastLED.h"
+// #include <AnimationColorWaves.h>
 
 FASTLED_USING_NAMESPACE
 
@@ -46,6 +48,10 @@ FASTLED_USING_NAMESPACE
     void setSolidColor(uint8_t r, uint8_t g, uint8_t b);
     CRGB getSolidColor();
     String getStatus();
+    uint8_t getCurrentPalette();
+    uint8_t getGHude();
+    CRGB getLeds();
+
     void run();
   private:
     CRGB _leds[NUM_LEDS];
@@ -99,9 +105,11 @@ FASTLED_USING_NAMESPACE
     void loadSettings();
 
 
-// [this](AsyncWebServerRequest *request)
     typedef void (*Pattern)();
+    // typedef void (ESPLedDriver::* Pattern)();
+    // typedef void (ESPLedAnimation::* Pattern)();
     typedef Pattern PatternList[];
+
     typedef struct {
       Pattern pattern;
       String name;
@@ -121,27 +129,26 @@ FASTLED_USING_NAMESPACE
     void colorwaves();
     void palettetest();
 
-    PatternAndNameList _patterns;
+    // PatternAndNameList _patterns;
     uint8_t _patternCount;
   // uint8_t _patternCount = 4;
 
     // List of patterns to cycle through.  Each is defined as a separate function below.
-    // PatternAndNameList patterns = {
-    //   { colorwaves, "Color Waves" },
-    //   { palettetest, "Palette Test" },
-    //   { pride, "Pride" },
-    //   { rainbow, "Rainbow" },
-    //   { rainbowWithGlitter, "Rainbow With Glitter" },
-    //   { confetti, "Confetti" },
-    //   { sinelon, "Sinelon" },
-    //   { juggle, "Juggle" },
-    //   { bpm, "BPM" },
-    //   { showSolidColor, "Solid Color" },
+    // PatternAndNameList _patterns = {
+    //   { AnimColorWaves::run, "Color Waves" },
+    // //   { palettetest, "Palette Test" },
+    // //   { pride, "Pride" },
+    // //   { rainbow, "Rainbow" },
+    // //   { rainbowWithGlitter, "Rainbow With Glitter" },
+    // //   { confetti, "Confetti" },
+    // //   { sinelon, "Sinelon" },
+    // //   { juggle, "Juggle" },
+    // //   { bpm, "BPM" },
+    // //   { showSolidColor, "Solid Color" },
     // };
 
     // const uint8_t patternCount = ARRAY_SIZE(patterns);
     void setPatterns();
 
   };
-
   #endif

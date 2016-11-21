@@ -209,24 +209,44 @@ animations
 */
 void ESPLedDriver::setPatterns()
 {
-  // const uint8_t patternCount;
-  PatternAndNameList patterns = {
-
-    // no luck: src/ESPLedDriver.cpp:225:3: error: cannot convert 'ESPLedDriver::colorwaves' from type 'void (ESPLedDriver::)()' to type 'ESPLedDriver::Pattern {aka void (*)()}'
-    { colorwaves, "Color Waves" },
-
-    // no luck: src/ESPLedDriver.cpp:225:3: error: cannot convert 'ESPLedDriver::palettetest' from type 'void (ESPLedDriver::)()' to type 'ESPLedDriver::Pattern {aka void (*)()}'
-    { this->palettetest, "Palette Test" },
-
-    // { this->pride, "Pride" },
-    // { this->rainbow, "Rainbow" },
-    // { this->rainbowWithGlitter, "Rainbow With Glitter" },
-    // { this->confetti, "Confetti" },
-    // { this->sinelon, "Sinelon" },
-    // { this->juggle, "Juggle" },
-    // { this->bpm, "BPM" },
-    // { this->showSolidColor, "Solid Color" },
+  // AnimColorWaves* colorWaves = new AnimColorWaves();
+  PatternAndNameList _patterns = {
+    // { AnimColorWaves::run, "Color Waves" },
+  //   { palettetest, "Palette Test" },
+  //   { pride, "Pride" },
+  //   { rainbow, "Rainbow" },
+  //   { rainbowWithGlitter, "Rainbow With Glitter" },
+  //   { confetti, "Confetti" },
+  //   { sinelon, "Sinelon" },
+  //   { juggle, "Juggle" },
+  //   { bpm, "BPM" },
+  //   { showSolidColor, "Solid Color" },
   };
+
+  // { int new AnimColorWaves(), "Color Waves" },
+
+  // const uint8_t patternCount;
+  // const PROGMEM  String  variableName[] = {
+  //   "a", "b"
+  // }; // or this form
+  //
+  // int patterns[2] = {
+  //
+  //   // no luck: src/ESPLedDriver.cpp:225:3: error: cannot convert 'ESPLedDriver::colorwaves' from type 'void (ESPLedDriver::)()' to type 'ESPLedDriver::Pattern {aka void (*)()}'
+  //   { colorwaves, "Color Waves" },
+  //
+  //   // no luck: src/ESPLedDriver.cpp:225:3: error: cannot convert 'ESPLedDriver::palettetest' from type 'void (ESPLedDriver::)()' to type 'ESPLedDriver::Pattern {aka void (*)()}'
+  //   { this->palettetest, "Palette Test" }
+  //
+  //   // { this->pride, "Pride" },
+  //   // { this->rainbow, "Rainbow" },
+  //   // { this->rainbowWithGlitter, "Rainbow With Glitter" },
+  //   // { this->confetti, "Confetti" },
+  //   // { this->sinelon, "Sinelon" },
+  //   // { this->juggle, "Juggle" },
+  //   // { this->bpm, "BPM" },
+  //   // { this->showSolidColor, "Solid Color" },
+  // };
 }
 void ESPLedDriver::showSolidColor()
 {
@@ -396,7 +416,15 @@ void ESPLedDriver::palettetest()
   fill_palette( _leds, NUM_LEDS, startindex, (256 / NUM_LEDS) + 1, _gCurrentPalette, 255, LINEARBLEND);
 }
 
-
+uint8_t ESPLedDriver::getCurrentPalette() {
+  return _gCurrentPaletteNumber;
+}
+uint8_t ESPLedDriver::getGHude() {
+  return _gHue;
+}
+CRGB ESPLedDriver::getLeds() {
+  // return _leds;
+}
 
 String ESPLedDriver::getStatus()
 {

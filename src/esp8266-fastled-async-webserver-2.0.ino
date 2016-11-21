@@ -27,6 +27,7 @@
 #include "ESPLedDriver.h"
 #include "ESPWebDriver.h"
 #include "ESPIRDriver.h"
+#include "Animation.h"
 
 
 
