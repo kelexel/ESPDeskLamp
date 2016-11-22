@@ -110,3 +110,9 @@ An ESP8266 development board, such as the [Adafruit HUZZAH ESP8266 Breakout], bu
 Addressable LED strip, such as the [Adafruit NeoPixel Ring], or any FastLED supported strip:
 
 [![Adafruit NeoPixel Ring](https://www.adafruit.com/images/145x109/1586-00.jpg)](https://www.adafruit.com/product/1586)
+
+References
+----------
+
+* https://github.com/jasoncoon/esp8266-fastled-webserver
+* http://internetofhomethings.com/homethings/?p=396

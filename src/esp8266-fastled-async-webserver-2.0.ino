@@ -63,12 +63,6 @@ IPAddress netmask(255, 255, 255, 0);
 
 
 /*
-IR Settings
-*/
-// #define RECV_PIN 12
-
-
-/*
 Config End
 */
 
@@ -80,13 +74,15 @@ Config End
 
 
 
-// Instantiate the "drivers"
-// IRrecv irReceiver(RECV_PIN);
-
 ESPWifiDriver wifidriver;
 ESPLedDriver leddriver;
 ESPWebDriver webdriver(&leddriver);
+
+/* IR Driver not tested */
+// #define RECV_PIN 12
+// IRrecv irReceiver(RECV_PIN);
 // ESPIRDriver irdriver(&irReceiver, &leddriver);
+
 
 void setup() {
   // Start the serial connection
@@ -104,7 +100,6 @@ void setup() {
   }
   wifidriver.setupMDNS(hostname);
   leddriver.setup();
-  leddriver.setSolidColor(CRGB::Yellow);
   webdriver.setRoutes();
   webdriver.begin();
 }
