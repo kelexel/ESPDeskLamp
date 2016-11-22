@@ -16,11 +16,15 @@ void ESPWebDriver::begin() {
   _server.begin();
 }
 void ESPWebDriver::setRoutes() {
-  _server.on("/", HTTP_GET, [this](AsyncWebServerRequest *request){
-    request->send(200, "text/plain", String("Hello world!"));
-  });
+  // _server.on("/", HTTP_GET, [this](AsyncWebServerRequest *request){
+  //   request->send(200, "text/plain", String("Hello world!"));
+  // });
 
   _server.on("/status", HTTP_GET, [this](AsyncWebServerRequest *request){
+    request->send(200, "text/json", _ledDriver->getStatus());
+  });
+  // Keep for compatibility with /js/scripts.js ... for now...
+  _server.on("/all", HTTP_GET, [this](AsyncWebServerRequest *request){
     request->send(200, "text/json", _ledDriver->getStatus());
   });
 
@@ -88,10 +92,18 @@ void ESPWebDriver::setRoutes() {
     }
   });
 
+  _server.serveStatic("/index.htm", SPIFFS, "/index.htm");
+  _server.serveStatic("/fonts", SPIFFS, "/fonts", "max-age=86400");
+  _server.serveStatic("/js", SPIFFS, "/js");
+  _server.serveStatic("/css", SPIFFS, "/css", "max-age=86400");
+  _server.serveStatic("/images", SPIFFS, "/images", "max-age=86400");
+  _server.serveStatic("/", SPIFFS, "/index.htm");
+
   _server.onNotFound([](AsyncWebServerRequest *request){
     request->send(404);
   });
 }
+
 void ESPWebDriver::handleRoot(AsyncWebServerRequest *request)
 {
   String indexHTML = F("<!DOCTYPE html><html><head><title>File not found</title></head><body><h1>File not found.</h1></body></html>");

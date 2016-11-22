@@ -30,10 +30,10 @@ void ESPWifiDriver::setupAP(const String hostname, const char* apWifiPSK){
 }
 
 void ESPWifiDriver::setupClientNetwork(IPAddress ip, IPAddress g, IPAddress n) {
-  Serial.print("Client DHCP: OFF ");
-  Serial.printf("IP Address: %u.%u.%u.%u ", ip[0], ip[1], ip[2], ip[3]);
-  Serial.printf("Gateway Address: %u.%u.%u.%u ", g[0], g[1], g[2], g[3]);
-  Serial.printf("Netmask Address: %u.%u.%u.%u ", n[0], n[1], n[2], n[3]);
+  Serial.println("Client DHCP: OFF ");
+  Serial.printf("IP Address: %u.%u.%u.%u \n", ip[0], ip[1], ip[2], ip[3]);
+  Serial.printf("Gateway Address: %u.%u.%u.%u \n", g[0], g[1], g[2], g[3]);
+  Serial.printf("Netmask Address: %u.%u.%u.%u \n", n[0], n[1], n[2], n[3]);
 
   WiFi.config(ip, g, n);
 }
@@ -53,19 +53,26 @@ void ESPWifiDriver::setupClient(const String hostname, const char* ssid, const c
     Serial.print(".");
   }
 
-  Serial.print("Connected! Open http://");
+  Serial.println("Connected!");
+  Serial.print("Open http://");
   Serial.print(WiFi.localIP());
-  Serial.println(" in your browser");
+  Serial.print(" or http://");
+  Serial.print(hostname);
+  Serial.println(".local in your browser");
 
 }
 void ESPWifiDriver::setupMDNS(const String hostname) {
-  // Uncommenting the following produces a bug : src/ESPWifiDriver.cpp:62:20: error: no matching function for call to 'MDNSResponder::begin(const String&)'
 
-  // if (!MDNS.begin(hostname)) {
-  //   Serial.println("Error setting up MDNS responder!");
-  //   while(1) {
-  //     delay(1000);
-  //   }
-  // }
-  // Serial.println("mDNS responder started");
+  char host[sizeof(hostname)];
+  hostname.toCharArray(host, sizeof(host));
+
+  Serial.println();
+  if (!MDNS.begin(host)) {
+    Serial.println("Error setting up MDNS responder!");
+    while(1) {
+      delay(500);
+    }
+  }
+  MDNS.addService("http", "tcp", 80);
+  Serial.println("MDNS responder started");
 }
