@@ -11,22 +11,59 @@ ESPLedDriver::ESPLedDriver() {
     _gTargetPalette = CRGBPalette16( gGradientPalettes[0] );
 }
 
+// void ESPLedDriver::setup() {
+//   FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(_leds, NUM_LEDS);         // for WS2812 (Neopixel)
+//   //FastLED.addLeds<LED_TYPE,DATA_PIN,CLK_PIN,COLOR_ORDER>(leds, NUM_LEDS); // for APA102 (Dotstar)
+//   FastLED.setCorrection(TypicalLEDStrip);
+//   FastLED.setBrightness(_brightness);
+//   FastLED.setMaxPowerInVoltsAndMilliamps(5, MILLI_AMPS);
+//   Serial.print('TEST ');
+//   Serial.println(String(_solidColor));
+//   _solidColor = CRGB::Blue;
+//   struct CRGB solidColor = CRGB::Blue;
+//   Serial.print('TEST2 ');
+//   Serial.println(String(solidColor));
+//
+//   fill_solid(_leds, NUM_LEDS, _solidColor);
+//   FastLED.show();
+// }
+//
 void ESPLedDriver::setup() {
+  loadSettings();
   FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(_leds, NUM_LEDS);         // for WS2812 (Neopixel)
   //FastLED.addLeds<LED_TYPE,DATA_PIN,CLK_PIN,COLOR_ORDER>(leds, NUM_LEDS); // for APA102 (Dotstar)
   FastLED.setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(_brightness);
   FastLED.setMaxPowerInVoltsAndMilliamps(5, MILLI_AMPS);
-  Serial.print('TEST ');
-  Serial.println(String(_solidColor));
-  _solidColor = CRGB::Blue;
-  struct CRGB solidColor = CRGB::Blue;
-  Serial.print('TEST2 ');
-  Serial.println(String(solidColor));
 
   fill_solid(_leds, NUM_LEDS, _solidColor);
   FastLED.show();
 }
+
+// void ESPLedDriver::loadSettings()
+// {
+//   _brightness = EEPROM.read(0);
+//
+//   _currentPatternIndex = EEPROM.read(1);
+//   if (_currentPatternIndex < 0)
+//     _currentPatternIndex = 0;
+//   else if (_currentPatternIndex >= _patternCount)
+//     _currentPatternIndex = _patternCount - 1;
+//
+//   byte r = EEPROM.read(2);
+//   byte g = EEPROM.read(3);
+//   byte b = EEPROM.read(4);
+//
+//   _speed = EEPROM.read(5);
+//
+//   if (r == 0 && g == 0 && b == 0)
+//   {
+//   }
+//   else
+//   {
+//     _solidColor = CRGB(r, g, b);
+//   }
+// }
 
 void ESPLedDriver::loadSettings()
 {
@@ -46,6 +83,7 @@ void ESPLedDriver::loadSettings()
 
   if (r == 0 && g == 0 && b == 0)
   {
+    _solidColor = CRGB::Blue;
   }
   else
   {
