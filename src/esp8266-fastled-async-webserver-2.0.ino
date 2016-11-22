@@ -36,7 +36,7 @@ Config Start
 */
 
 // Hostname for the Lmp
-const String hostname = "Lmp";
+const String hostname = "TestLamp";
 
 
 /*
@@ -54,7 +54,7 @@ Wireless client settings (apMode = false)
 const char* ssid = "neuro";
 const char* password = "HelloHowAreYu";
 
-const bool clientUseDHCP = false;
+const bool clientUseDHCP = true;
 
 // ip, gateway, netmask, only used if ClientUseDHCP = true
 IPAddress ip(192, 168, 6, 243);
@@ -65,7 +65,7 @@ IPAddress netmask(255, 255, 255, 0);
 /*
 IR Settings
 */
-#define RECV_PIN 12
+// #define RECV_PIN 12
 
 
 /*
@@ -81,12 +81,12 @@ Config End
 
 
 // Instantiate the "drivers"
-IRrecv irReceiver(RECV_PIN);
+// IRrecv irReceiver(RECV_PIN);
 
 ESPWifiDriver wifidriver;
 ESPLedDriver leddriver;
 ESPWebDriver webdriver(&leddriver);
-ESPIRDriver irdriver(&irReceiver, &leddriver);
+// ESPIRDriver irdriver(&irReceiver, &leddriver);
 
 void setup() {
   // Start the serial connection
