@@ -4,6 +4,7 @@ FastLED + ESP8266 Async Web Server
 Control an addressable LED strip with an ESP8266 via a web browser or infrared remote control, or MQTT, or homekit.
 
 * Built with Platformio
+* Works with *homebridge-better-http-rgb* (yay!), see below.
 
 Purpose
 -------
@@ -21,34 +22,26 @@ Features
 --------
 
 Currently, none that make this usable.
-* *ESPWifiDriver* is a class made to handle the basic network stack: act as an access point, or act as a wifi client, advertise the services using mDNS.
+* *ESPWifiDriver* is a class made to handle the basic network stack: act as an access point, or act as a wifi client, advertise the services using mDNS (except mDNS is broken for now)
 * *ESPLedDriver* is a class made to handle the FastLED settings, animations, and palettes.
 * *ESPWebDriver* is a class made to handle HTTP requests, and invoke the ESPLedDriver accordingly.
 * *ESPIRDriver* is a class made to handle IR remote codes, and invoke the ESPLedDriver accordingly.
 
+
 I plan to include the following:
 * IR support from the original "FastLED + ESP8266 Web Server"
 * MQTT support
-* homebridge-better-http-rgb support (including Hue and Saturation)
 * HTTP Ui support, either from the original "FastLED + ESP8266 Web Server" or a home baked one.
 
 
 Status
 ------
 
-Before you read any further, here is the current status of the project:
-
-* It compiles, but contains 45 warnings (hmm...)
-* It hasn't been flashed to any device - yet
-* This is my first attempt at writing arduino code, so expect to find many mistakes, so please, submit PRs
-
-Issues
-------
-
-* I really wonder if *ESPWebDriver* works :)
-* There is currently one main issue blocking me, in *ESPLedDriver.h* on *line 121*
+* ESPLedDriver::hexToRGB and ESPLedDriver::RGBToHex probably need a rewrite to improve conversion speed.
+* It crashes from time to time, not sure -yet- why.
 * MDNS isn't working, I need to dig why, but I hope *ESPWifiDriver* kind of works
 * The *ESPIRDriver* is roughly a class, for now.
+* This is my first attempt at writing C++ code, so expect to find many mistakes... Please, feel free to fork and make a PR...
 
 
 Install
@@ -73,6 +66,39 @@ Install the following libraries using `pio lib update`
 
 Than build and flash
 
+
+homebridge-better-http-rgb setup
+--------------------------------
+
+Install homebridge following directions found at https://github.com/nfarina/homebridge
+
+Install homebridge-better-http-rgb using `npm install -g homebridge-better-http-rgb`
+
+In your `.homebridge/config.conf` file, add something like this (replacing 192.168.6.243 with your device's IP address):
+
+```
+"accessories": [
+    {
+      "accessory": "HTTP-RGB",
+      "name": "Single Color Light",
+      "http_method": "POST",
+      "switch": {
+        "status": "http://192.168.6.243/power",
+        "powerOn": "http://192.168.6.243/power?value=1",
+        "powerOff": "http://192.168.6.243/power?value=0"
+      },
+      "brightness": {
+        "status": "http://192.168.6.243/brightness",
+        "url": "http://192.168.6.243/brightness?value=%s"
+      },
+      "color": {
+        "status": "http://192.168.6.243/color",
+        "url": "http://192.168.6.243/color?value=%s",
+        "brightness": false
+      }
+    }
+  ]
+```
 
 Hardware
 --------
