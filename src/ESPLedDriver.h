@@ -7,7 +7,7 @@
 //#define FASTLED_ESP8266_RAW_PIN_ORDER
 #include <Arduino.h>
 #include <EEPROM.h>
-#include "FastLED.h"
+#include <FastLED.h>
 // #include <AnimationColorWaves.h>
 
 FASTLED_USING_NAMESPACE
@@ -46,15 +46,19 @@ FASTLED_USING_NAMESPACE
     void setPattern(int value);
     void setSolidColor(CRGB color);
     void setSolidColor(uint8_t r, uint8_t g, uint8_t b);
-    CRGB getSolidColor();
+    struct CRGB getSolidColor();
+    String getSolidColorHex();
     String getStatus();
     uint8_t getCurrentPalette();
-    uint8_t getGHude();
-    CRGB getLeds();
+    uint8_t getGHue();
+    void loadSettings();
+    struct CRGB getLeds();
+    struct CRGB _leds[NUM_LEDS];
+    struct CRGB hexToRGB(String hex);
+    String RGBToHex(struct CRGB rgbColor);
 
     void run();
   private:
-    CRGB _leds[NUM_LEDS];
 
     uint8_t _power;
     uint8_t _r;
@@ -72,9 +76,9 @@ FASTLED_USING_NAMESPACE
     uint8_t _brightness = _brightnessMap[_brightnessIndex];
 
     static const uint8_t _speedCount = 5;
-    uint8_t _speedMap[_speedCount] = { 16, 32, 64, 128, 255 };
-    int _speedIndex = 0;
-    uint8_t _speed = _speedMap[_speedCount];
+    uint8_t _speedMap[_speedCount] = { 16, 32, 64, 100, 255 };
+    int _speedIndex = 4;
+    uint8_t _speed = _speedMap[_speedIndex];
 
     int _framesPerSecond = 100;
     int _secondsPerPalette = 120;
@@ -99,10 +103,9 @@ FASTLED_USING_NAMESPACE
 
     uint8_t _gHue = 0; // rotating "base color" used by many of the patterns
 
-    CRGB _solidColor = CRGB::Blue;
+    CRGB _solidColor;
 
     // uint8_t _patternCount = 4;
-    void loadSettings();
 
 
     typedef void (*Pattern)();

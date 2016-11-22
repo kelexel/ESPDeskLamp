@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <math.h>
 #include "ESPLedDriver.h"
 #include "GradientPalettes.h"
 
@@ -16,6 +17,13 @@ void ESPLedDriver::setup() {
   FastLED.setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(_brightness);
   FastLED.setMaxPowerInVoltsAndMilliamps(5, MILLI_AMPS);
+  Serial.print('TEST ');
+  Serial.println(String(_solidColor));
+  _solidColor = CRGB::Blue;
+  struct CRGB solidColor = CRGB::Blue;
+  Serial.print('TEST2 ');
+  Serial.println(String(solidColor));
+
   fill_solid(_leds, NUM_LEDS, _solidColor);
   FastLED.show();
 }
@@ -55,7 +63,12 @@ uint8_t ESPLedDriver::getPower() {
   return _power;
 }
 void ESPLedDriver::setPower(uint8_t value) {
-  _power = value;
+  if (_power != value) {
+    _power = value;
+    if (value == 1) {
+      fill_solid(_leds, NUM_LEDS, _solidColor);
+    }
+  }
 }
 
 
@@ -65,7 +78,7 @@ brightness
 */
 
 uint8_t ESPLedDriver::getBrightness() {
-  return _brightness;
+  return round(_brightness / 2.5);
 }
 // adjust the brightness, and wrap around at the ends
 void ESPLedDriver::adjustBrightness(bool up)
@@ -91,11 +104,14 @@ void ESPLedDriver::adjustBrightness(bool up)
 
 void ESPLedDriver::setBrightness(uint8_t value) {
   // don't wrap around at the ends
+  value = round(value * 2.5);
   if (value > 255)
     value = 255;
   else if (value < 0) value = 0;
 
   _brightness = value;
+  Serial.print("B: ");
+  Serial.println(String(value));
 
   FastLED.setBrightness(_brightness);
 
@@ -162,11 +178,19 @@ void ESPLedDriver::setSolidColor(uint8_t r, uint8_t g, uint8_t b)
   EEPROM.write(3, g);
   EEPROM.write(4, b);
 
-  setPattern(_patternCount - 1);
+  fill_solid(_leds, NUM_LEDS, _solidColor);
+  // setSolidColor(_solidColor);
+  // setPattern(_patternCount - 1);
 }
 CRGB ESPLedDriver::getSolidColor()
 {
   return _solidColor;
+}
+String ESPLedDriver::getSolidColorHex()
+{
+  char hex[7] = {0};
+  sprintf(hex,"%02X%02X%02X",_solidColor.r,_solidColor.g,_solidColor.b); //convert to an hexadecimal string. Lookup sprintf for what %02X means.
+  return hex;
 }
 // increase or decrease the current pattern number, and wrap around at the ends
 void ESPLedDriver::adjustPattern(bool up)
@@ -419,10 +443,10 @@ void ESPLedDriver::palettetest()
 uint8_t ESPLedDriver::getCurrentPalette() {
   return _gCurrentPaletteNumber;
 }
-uint8_t ESPLedDriver::getGHude() {
+uint8_t ESPLedDriver::getGHue() {
   return _gHue;
 }
-CRGB ESPLedDriver::getLeds() {
+struct CRGB ESPLedDriver::getLeds() {
   // return _leds;
 }
 
@@ -462,15 +486,33 @@ String ESPLedDriver::getStatus()
 
 
 
-
-
+struct CRGB ESPLedDriver::hexToRGB(String hex) {
+  int number = (int) strtol( &hex[0], NULL, 16);
+  int r = number >> 16;
+  int g = number >> 8 & 0xFF;
+  int b = number & 0xFF;
+  struct CRGB rgbColor = CRGB(r, g, b);
+  return rgbColor;
+}
+String ESPLedDriver::RGBToHex(struct CRGB rgbColor) {
+  char hex[7] = {0};
+  sprintf(hex,"%02X-%02X-%02X",rgbColor.r,rgbColor.g,rgbColor.b); //convert to an hexadecimal string. Lookup sprintf for what %02X means.
+  return String(hex);
+}
 
 
 void ESPLedDriver::run() {
   if (_power == 0) {
+    // Serial.println("POWER OFF");
     fill_solid(_leds, NUM_LEDS, CRGB::Black);
     FastLED.show();
     FastLED.delay(15);
     return;
   }
+  // FastLED.show();
+
+  // fill_solid(_leds, NUM_LEDS, _solidColor);
+  // insert a delay to keep the framerate modest
+  //FastLED.delay(1000 / FRAMES_PER_SECOND);
+  // FastLED.delay(1000 / 100);
 }

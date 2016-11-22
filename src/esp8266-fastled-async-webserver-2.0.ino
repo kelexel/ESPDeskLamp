@@ -84,9 +84,9 @@ Config End
 IRrecv irReceiver(RECV_PIN);
 
 ESPWifiDriver wifidriver;
-ESPLedDriver pixeldriver;
-ESPWebDriver webdriver(&pixeldriver);
-ESPIRDriver irdriver(&irReceiver, &pixeldriver);
+ESPLedDriver leddriver;
+ESPWebDriver webdriver(&leddriver);
+ESPIRDriver irdriver(&irReceiver, &leddriver);
 
 void setup() {
   // Start the serial connection
@@ -103,8 +103,27 @@ void setup() {
     wifidriver.setupClient(hostname, ssid, password);
   }
   wifidriver.setupMDNS(hostname);
+  leddriver.setup();
+  leddriver.setSolidColor(CRGB::Yellow);
+  webdriver.setRoutes();
+  webdriver.begin();
 }
 
 void loop() {
+  // leddriver.run();
+  if (leddriver.getPower() == 0) {
+    // Serial.println("POWER OFF");
+    fill_solid(leddriver._leds, NUM_LEDS, CRGB::Black);
+    FastLED.show();
+    FastLED.delay(15);
+    return;
+  }
+  FastLED.show();
+
+  // fill_solid(leddriver._leds, NUM_LEDS, leddriver.getSolidColor());
+  // fill_solid(_leds, NUM_LEDS, _solidColor);
+  // insert a delay to keep the framerate modest
+  //FastLED.delay(1000 / FRAMES_PER_SECOND);
+  FastLED.delay(100);
 
 }

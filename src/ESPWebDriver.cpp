@@ -13,30 +13,84 @@ ESPWebDriver::ESPWebDriver(ESPLedDriver* ledDriver) {
   _ledDriver = ledDriver;
 }
 void ESPWebDriver::begin() {
+  _server.begin();
 }
 void ESPWebDriver::setRoutes() {
+  _server.on("/", HTTP_GET, [this](AsyncWebServerRequest *request){
+    request->send(200, "text/plain", String("Hello world!"));
+  });
+
+  _server.on("/status", HTTP_GET, [this](AsyncWebServerRequest *request){
+    request->send(200, "text/json", _ledDriver->getStatus());
+  });
+
   _server.on("/power", HTTP_GET, [this](AsyncWebServerRequest *request){
+    Serial.print("Power: ");
     int power = _ledDriver->getPower();
+    Serial.println(String(power));
     request->send(200, "text/plain", String(power));
   });
 
   _server.on("/power", HTTP_POST, [this](AsyncWebServerRequest *request){
-    AsyncWebParameter* power = request->getParam("value", true);
-    _ledDriver->setPower(power->value().toInt());
-    request->send(200, "text/plain", String("OK"));
+    if(request->hasArg("value")) {
+      Serial.print("Power: ");
+      String power = request->arg("value");
+      Serial.println(String(power));
+      _ledDriver->setPower(power.toInt());
+      request->send(200, "text/plain", String(power));
+    } else {
+      request->send(200, "text/plain", String("Error"));
+    }
   });
 
   _server.on("/brightness", HTTP_GET, [this](AsyncWebServerRequest *request){
+    Serial.print("Brightness: ");
     int brightness = _ledDriver->getBrightness();
+    Serial.println(String(brightness));
     request->send(200, "text/plain", String(brightness));
   });
 
   _server.on("/brightness", HTTP_POST, [this](AsyncWebServerRequest *request){
-    AsyncWebParameter* brightness = request->getParam("value", true);
-    _ledDriver->setBrightness(brightness->value().toInt());
-    request->send(200, "text/plain", String("OK"));
+    if(request->hasArg("value")) {
+      Serial.print("Brightness: ");
+      String brightness = request->arg("value");
+      Serial.println(String(brightness));
+      _ledDriver->setBrightness(brightness.toInt());
+      request->send(200, "text/plain", String(brightness));
+    } else {
+      Serial.println("Invalid arg received for /brightness");
+      request->send(200, "text/plain", String("Error"));
+    }
   });
 
+  _server.on("/color", HTTP_GET, [this](AsyncWebServerRequest *request){
+    Serial.print("Current color: ");
+    String color = _ledDriver->getSolidColorHex();
+    Serial.println(color);
+    request->send(200, "text/plain", String(color));
+  });
+  _server.on("/color", HTTP_POST, [this](AsyncWebServerRequest *request){
+    if(request->hasArg("value")) {
+      Serial.print("Color: ");
+      String color = request->arg("value");
+      Serial.println(String(color));
+      // Serial.print("RGB: ");
+      struct CRGB rgbColor = _ledDriver->hexToRGB(color);
+      // Serial.println(rgbColor);
+      _ledDriver->setSolidColor(rgbColor);
+      // Serial.print("HEX: ");
+      // String hexColor = _ledDriver->RGBToHex(rgbColor);
+      // Serial.println(hexColor);
+      request->send(200, "text/plain", String(color));
+    } else {
+      Serial.println("Invalid arg received for /color");
+      request->send(200, "text/plain", String("Error"));
+    }
+  });
+
+  _server.onNotFound([](AsyncWebServerRequest *request){
+    request->send(404);
+  });
 }
 void ESPWebDriver::handleRoot(AsyncWebServerRequest *request)
 {

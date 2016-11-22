@@ -30,10 +30,10 @@ void ESPWifiDriver::setupAP(const String hostname, const char* apWifiPSK){
 }
 
 void ESPWifiDriver::setupClientNetwork(IPAddress ip, IPAddress g, IPAddress n) {
-  Serial.print("Client DHCP: OFF");
-  Serial.printf("IP Address: %u.%u.%u.%u", ip[0], ip[1], ip[2], ip[3]);
-  Serial.printf("Gateway Address: %u.%u.%u.%u", g[0], g[1], g[2], g[3]);
-  Serial.printf("Netmask Address: %u.%u.%u.%u", n[0], n[1], n[2], n[3]);
+  Serial.print("Client DHCP: OFF ");
+  Serial.printf("IP Address: %u.%u.%u.%u ", ip[0], ip[1], ip[2], ip[3]);
+  Serial.printf("Gateway Address: %u.%u.%u.%u ", g[0], g[1], g[2], g[3]);
+  Serial.printf("Netmask Address: %u.%u.%u.%u ", n[0], n[1], n[2], n[3]);
 
   WiFi.config(ip, g, n);
 }
@@ -67,5 +67,5 @@ void ESPWifiDriver::setupMDNS(const String hostname) {
   //     delay(1000);
   //   }
   // }
-  Serial.println("mDNS responder started");
+  // Serial.println("mDNS responder started");
 }
