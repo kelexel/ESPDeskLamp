@@ -1,5 +1,31 @@
-FastLED + ESP8266 Async Web Server
-=========
+ESP Desk Lamp
+=============
+
+An ESP8266 and FastLED desk lamp.
+
+
+
+About
+-----
+This is a humble rewrite of [[FastLED + ESP8266 Web Server](https://github.com/jasoncoon/esp8266-fastled-webserver)] by *Jason Coon*, using [[ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer)] and lots of Class refactoring.
+
+The original code relied on the regular WebServer package for the ESP, which as you probably know, doesn't play really well if you query it too frequently...
+
+The idea is to use [[ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer)] instead, which as the name implies, runs asynchronously and, in general, works pretty well.
+
+It also includes [[ColorWavesWithPalettes]( https://gist.github.com/kriegsman/8281905786e8b2632aeb)] by *Mark Kriegsman*
+
+And bits of codes from many sources I (try to) reference in the source code.
+
+This is my first attempt at writing C++ code, so expect to find many mistakes... Incoherences... Stupidity...
+
+Please, feel free to fork this project.
+
+Make a PR, or open a ticket in the Issues section.
+
+Rudolph Sand (Kelexel)
+11/23/2016
+
 
 Features
 --------
@@ -12,22 +38,10 @@ Features
 * Set Power, Brightness, Speed, Hue, Palette, Pattern via an API running on [[ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer)] (async! yay!)
 
 
-About
------
-This is a humble rewrite attempt of [[FastLED + ESP8266 Web Server](https://github.com/jasoncoon/esp8266-fastled-webserver)] by *Jason Coon*.
-
-It also includes [[ColorWavesWithPalettes]( https://gist.github.com/kriegsman/8281905786e8b2632aeb)] by *Mark Kriegsman*
-
-The original code relied on the regular WebServer package for the ESP, which as you probably know, doesn't play really well if you query it too frequently...
-
-The idea is to use ESPAsyncWebServer instead, which as the name implies, runs asynchronously and, in general, works pretty well.
-
-This is my first attempt at writing C++ code, so expect to find many mistakes... Please, feel free to fork and make a PR...
-
-
 A crash course into C++ classes
----------
-* Again, again, again, this is my first attempt at some C++ code. Some methods can probably be refactored.
+-------------------------------
+* Again, again, again, this is my first attempt at some C++ code. Some methods will probably be refactored.
+* This is a training exercise for me. Go from A to B, using the most elegant *(hum...)* route.
 * *ESPWifiDriver* is a class made to handle the basic network stack: act as an access point, or act as a wifi client, advertise the services using mDNS. It might become Singleton...
 * *ESPFastLedDriver* is a class made to handle the FastLED settings, animations, and palettes.
 * *ESPWebDriver* is a class made to handle HTTP requests, and invoke the ESPFastLedDriver accordingly. It might also become a Singleton
