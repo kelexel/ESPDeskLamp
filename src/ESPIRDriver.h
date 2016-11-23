@@ -7,15 +7,15 @@
 // IRrecv irReceiver(RECV_PIN);
 // #include "IRCommands.h"
 // #include <IRCommands.h>
-#include <ESPLedDriver.h>
+#include <ESPFastLedDriver.h>
 
 class ESPIRDriver
 {
 public:
-  ESPIRDriver(IRrecv* irReceiver, ESPLedDriver* ledDriver);
+  ESPIRDriver(IRrecv* irReceiver, ESPFastLedDriver* ledDriver);
   void run();
 private:
-  ESPLedDriver* _ledDriver;
+  ESPFastLedDriver* _ledDriver;
   IRrecv* _irReceiver;
 };
 

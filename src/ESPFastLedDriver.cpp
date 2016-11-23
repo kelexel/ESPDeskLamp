@@ -1,15 +1,15 @@
 #include <Arduino.h>
 #include <math.h>
-#include "ESPLedDriver.h"
+#include "ESPFastLedDriver.h"
 #include <GradientPalettes.h>
 
 
-ESPLedDriver::ESPLedDriver() {
+ESPFastLedDriver::ESPFastLedDriver() {
     _gCurrentPalette = CRGBPalette16( CRGB::Black);
     _gTargetPalette = CRGBPalette16( gGradientPalettes[0] );
 }
 
-// void ESPLedDriver::setup() {
+// void ESPFastLedDriver::setup() {
 //   FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(_leds, NUM_LEDS);         // for WS2812 (Neopixel)
 //   //FastLED.addLeds<LED_TYPE,DATA_PIN,CLK_PIN,COLOR_ORDER>(leds, NUM_LEDS); // for APA102 (Dotstar)
 //   FastLED.setCorrection(TypicalLEDStrip);
@@ -26,7 +26,7 @@ ESPLedDriver::ESPLedDriver() {
 //   FastLED.show();
 // }
 //
-void ESPLedDriver::setup() {
+void ESPFastLedDriver::setup() {
   // setPower(1);
   // setBrightness(100);
   loadSettings();
@@ -41,7 +41,7 @@ void ESPLedDriver::setup() {
   FastLED.show();
 }
 
-// void ESPLedDriver::loadSettings()
+// void ESPFastLedDriver::loadSettings()
 // {
 //   _brightness = EEPROM.read(0);
 //
@@ -66,7 +66,7 @@ void ESPLedDriver::setup() {
 //   }
 // }
 
-void ESPLedDriver::loadSettings()
+void ESPFastLedDriver::loadSettings()
 {
   _brightness = EEPROM.read(0);
 
@@ -103,10 +103,10 @@ void ESPLedDriver::loadSettings()
 Power
 */
 
-uint8_t ESPLedDriver::getPower() {
+uint8_t ESPFastLedDriver::getPower() {
   return _power;
 }
-void ESPLedDriver::setPower(uint8_t value) {
+void ESPFastLedDriver::setPower(uint8_t value) {
   if (_power != value) {
     _power = value;
     _powerIsDown = false;
@@ -122,11 +122,11 @@ void ESPLedDriver::setPower(uint8_t value) {
 brightness
 */
 
-uint8_t ESPLedDriver::getBrightness() {
+uint8_t ESPFastLedDriver::getBrightness() {
   return round(_brightness / 2.5);
 }
 // adjust the brightness, and wrap around at the ends
-void ESPLedDriver::adjustBrightness(bool up)
+void ESPFastLedDriver::adjustBrightness(bool up)
 {
   if (up)
     _brightnessIndex++;
@@ -147,7 +147,7 @@ void ESPLedDriver::adjustBrightness(bool up)
   EEPROM.commit();
 }
 
-void ESPLedDriver::setBrightness(uint8_t value) {
+void ESPFastLedDriver::setBrightness(uint8_t value) {
   // don't wrap around at the ends
   value = round(value * 2.5);
   if (value > 255)
@@ -172,7 +172,7 @@ Speed
 */
 
 // adjust the speed, and wrap around at the ends
-void ESPLedDriver::adjustSpeed(bool up)
+void ESPFastLedDriver::adjustSpeed(bool up)
 {
   if (up)
     _speedIndex++;
@@ -193,7 +193,7 @@ void ESPLedDriver::adjustSpeed(bool up)
 //  EEPROM.commit();
 }
 
-void ESPLedDriver::setSpeed(uint8_t value)
+void ESPFastLedDriver::setSpeed(uint8_t value)
 {
   // don't wrap around at the ends
   if (value > 255)
@@ -208,12 +208,12 @@ void ESPLedDriver::setSpeed(uint8_t value)
 
 
 
-void ESPLedDriver::setSolidColor(CRGB color)
+void ESPFastLedDriver::setSolidColor(CRGB color)
 {
   setSolidColor(color.r, color.g, color.b);
 }
 
-void ESPLedDriver::setSolidColor(uint8_t r, uint8_t g, uint8_t b)
+void ESPFastLedDriver::setSolidColor(uint8_t r, uint8_t g, uint8_t b)
 {
   _solidColor = CRGB(r, g, b);
 
@@ -224,18 +224,18 @@ void ESPLedDriver::setSolidColor(uint8_t r, uint8_t g, uint8_t b)
   fill_solid(_leds, NUM_LEDS, _solidColor);
   setPattern(0);
 }
-CRGB ESPLedDriver::getSolidColor()
+CRGB ESPFastLedDriver::getSolidColor()
 {
   return _solidColor;
 }
-String ESPLedDriver::getSolidColorHex()
+String ESPFastLedDriver::getSolidColorHex()
 {
   char hex[7] = {0};
   sprintf(hex,"%02X%02X%02X",_solidColor.r,_solidColor.g,_solidColor.b); //convert to an hexadecimal string. Lookup sprintf for what %02X means.
   return hex;
 }
 // increase or decrease the current pattern number, and wrap around at the ends
-void ESPLedDriver::adjustPattern(bool up)
+void ESPFastLedDriver::adjustPattern(bool up)
 {
   if (up)
     _currentPatternIndex++;
@@ -251,11 +251,11 @@ void ESPLedDriver::adjustPattern(bool up)
   EEPROM.write(1, _currentPatternIndex);
   EEPROM.commit();
 }
-uint8_t ESPLedDriver::getCurrentPattern()
+uint8_t ESPFastLedDriver::getCurrentPattern()
 {
   return _currentPatternIndex;
 }
-String ESPLedDriver::getCurrentPatternJson()
+String ESPFastLedDriver::getCurrentPatternJson()
 {
   String json = "{";
   json += "\"index\":" + String(_currentPatternIndex);
@@ -265,7 +265,7 @@ String ESPLedDriver::getCurrentPatternJson()
 }
 
 
-void ESPLedDriver::setPattern(int value)
+void ESPFastLedDriver::setPattern(int value)
 {
   // don't wrap around at the ends
   if (value < 0)
@@ -286,7 +286,7 @@ void ESPLedDriver::setPattern(int value)
 /*
 animations
 */
-// void ESPLedDriver::setPatterns()
+// void ESPFastLedDriver::setPatterns()
 // {
 //   // AnimColorWaves* colorWaves = new AnimColorWaves();
   // PatternAndNameList _patterns = {
@@ -311,10 +311,10 @@ animations
 //   //
 //   // int patterns[2] = {
 //   //
-//   //   // no luck: src/ESPLedDriver.cpp:225:3: error: cannot convert 'ESPLedDriver::colorwaves' from type 'void (ESPLedDriver::)()' to type 'ESPLedDriver::Pattern {aka void (*)()}'
+//   //   // no luck: src/ESPFastLedDriver.cpp:225:3: error: cannot convert 'ESPFastLedDriver::colorwaves' from type 'void (ESPFastLedDriver::)()' to type 'ESPFastLedDriver::Pattern {aka void (*)()}'
 //   //   { colorwaves, "Color Waves" },
 //   //
-//   //   // no luck: src/ESPLedDriver.cpp:225:3: error: cannot convert 'ESPLedDriver::palettetest' from type 'void (ESPLedDriver::)()' to type 'ESPLedDriver::Pattern {aka void (*)()}'
+//   //   // no luck: src/ESPFastLedDriver.cpp:225:3: error: cannot convert 'ESPFastLedDriver::palettetest' from type 'void (ESPFastLedDriver::)()' to type 'ESPFastLedDriver::Pattern {aka void (*)()}'
 //   //   { this->palettetest, "Palette Test" }
 //   //
 //   //   // { this->pride, "Pride" },
@@ -327,36 +327,36 @@ animations
 //   //   // { this->showSolidColor, "Solid Color" },
 //   // };
 // }
-void ESPLedDriver::ack()
+void ESPFastLedDriver::ack()
 {
   addGlitter(100);
 }
-void ESPLedDriver::showSolidColor()
+void ESPFastLedDriver::showSolidColor()
 {
   fill_solid(_leds, NUM_LEDS, _solidColor);
 }
 
-void ESPLedDriver::rainbow()
+void ESPFastLedDriver::rainbow()
 {
   // FastLED's built-in rainbow generator
   fill_rainbow( _leds, NUM_LEDS, _gHue, 10);
 }
 
-void ESPLedDriver::rainbowWithGlitter()
+void ESPFastLedDriver::rainbowWithGlitter()
 {
   // built-in FastLED rainbow, plus some random sparkly glitter
   rainbow();
   addGlitter(80);
 }
 
-void ESPLedDriver::addGlitter( fract8 chanceOfGlitter)
+void ESPFastLedDriver::addGlitter( fract8 chanceOfGlitter)
 {
   if ( random8() < chanceOfGlitter) {
     _leds[ random16(NUM_LEDS) ] += CRGB::White;
   }
 }
 
-void ESPLedDriver::confetti()
+void ESPFastLedDriver::confetti()
 {
   // random colored speckles that blink in and fade smoothly
   fadeToBlackBy( _leds, NUM_LEDS, 10);
@@ -364,7 +364,7 @@ void ESPLedDriver::confetti()
   _leds[pos] += CHSV( _gHue + random8(64), 200, 255);
 }
 
-void ESPLedDriver::sinelon()
+void ESPFastLedDriver::sinelon()
 {
   // a colored dot sweeping back and forth, with fading trails
   fadeToBlackBy( _leds, NUM_LEDS, 20);
@@ -372,7 +372,7 @@ void ESPLedDriver::sinelon()
   _leds[pos] += CHSV( _gHue, 255, 192);
 }
 
-void ESPLedDriver::bpm()
+void ESPFastLedDriver::bpm()
 {
   // colored stripes pulsing at a defined Beats-Per-Minute (BPM)
   uint8_t BeatsPerMinute = 62;
@@ -383,7 +383,7 @@ void ESPLedDriver::bpm()
   }
 }
 
-void ESPLedDriver::juggle()
+void ESPFastLedDriver::juggle()
 {
   // eight colored dots, weaving in and out of sync with each other
   fadeToBlackBy( _leds, NUM_LEDS, 20);
@@ -398,7 +398,7 @@ void ESPLedDriver::juggle()
 // Pride2015 by Mark Kriegsman: https://gist.github.com/kriegsman/964de772d64c502760e5
 // This function draws rainbows with an ever-changing,
 // widely-varying set of parameters.
-void ESPLedDriver::pride() {
+void ESPFastLedDriver::pride() {
   static uint16_t sPseudotime = 0;
   static uint16_t sLastMillis = 0;
   static uint16_t sHue16 = 0;
@@ -442,7 +442,7 @@ void ESPLedDriver::pride() {
 // ColorWavesWithPalettes by Mark Kriegsman: https://gist.github.com/kriegsman/8281905786e8b2632aeb
 // This function draws color waves with an ever-changing,
 // widely-varying set of parameters, using a color palette.
-void ESPLedDriver::colorwaves()
+void ESPFastLedDriver::colorwaves()
 {
   static uint16_t sPseudotime = 0;
   static uint16_t sLastMillis = 0;
@@ -492,7 +492,7 @@ void ESPLedDriver::colorwaves()
 
 // Alternate rendering function just scrolls the current palette
 // across the defined LED strip.
-void ESPLedDriver::palettetest()
+void ESPFastLedDriver::palettetest()
 {
   static uint8_t startindex = 0;
   startindex--;
@@ -500,8 +500,8 @@ void ESPLedDriver::palettetest()
 }
 
 // adapted from http://www.tweaking4all.com/hardware/arduino/adruino-led-strip-effects/#fire
-void ESPLedDriver::fire(int Cooling, int Sparking, int SpeedDelay) {
-// void ESPLedDriver::fire(int Cooling, int Sparking) {
+void ESPFastLedDriver::fire(int Cooling, int Sparking, int SpeedDelay) {
+// void ESPFastLedDriver::fire(int Cooling, int Sparking) {
   static byte heat[NUM_LEDS];
   int cooldown;
 
@@ -535,7 +535,7 @@ void ESPLedDriver::fire(int Cooling, int Sparking, int SpeedDelay) {
   FastLED.delay(SpeedDelay);
 }
 
-void ESPLedDriver::setPixelHeatColor (int Pixel, byte temperature) {
+void ESPFastLedDriver::setPixelHeatColor (int Pixel, byte temperature) {
   // Scale 'heat' down from 0-255 to 0-191
   byte t192 = round((temperature/255.0)*191);
 
@@ -564,20 +564,20 @@ void ESPLedDriver::setPixelHeatColor (int Pixel, byte temperature) {
 
 
 
-// struct CRGBPalette16 ESPLedDriver::getCurrentPalette() {
+// struct CRGBPalette16 ESPFastLedDriver::getCurrentPalette() {
 //   return _gCurrentPalette;
 // }
-uint8_t ESPLedDriver::getGHue() {
+uint8_t ESPFastLedDriver::getGHue() {
   return _gHue;
 }
-uint8_t ESPLedDriver::getSpeed() {
+uint8_t ESPFastLedDriver::getSpeed() {
   return _speed;
 }
-struct CRGB ESPLedDriver::getLeds() {
+struct CRGB ESPFastLedDriver::getLeds() {
   // return _leds;
 }
 
-String ESPLedDriver::getStatus()
+String ESPFastLedDriver::getStatus()
 {
   String json = "{";
 
@@ -614,7 +614,7 @@ String ESPLedDriver::getStatus()
 
 
 
-struct CRGB ESPLedDriver::hexToRGB(String hex) {
+struct CRGB ESPFastLedDriver::hexToRGB(String hex) {
   int number = (int) strtol( &hex[0], NULL, 16);
   int r = number >> 16;
   int g = number >> 8 & 0xFF;
@@ -622,27 +622,27 @@ struct CRGB ESPLedDriver::hexToRGB(String hex) {
   struct CRGB rgbColor = CRGB(r, g, b);
   return rgbColor;
 }
-String ESPLedDriver::RGBToHex(struct CRGB rgbColor) {
+String ESPFastLedDriver::RGBToHex(struct CRGB rgbColor) {
   char hex[7] = {0};
   sprintf(hex,"%02X-%02X-%02X",rgbColor.r,rgbColor.g,rgbColor.b); //convert to an hexadecimal string. Lookup sprintf for what %02X means.
   return String(hex);
 }
 
 
-void ESPLedDriver::setPalette(uint8_t value) {
+void ESPFastLedDriver::setPalette(uint8_t value) {
 
 }
-uint8_t ESPLedDriver::getCurrentPalette() {
+uint8_t ESPFastLedDriver::getCurrentPalette() {
   return _gCurrentPaletteNumber;
 }
-void ESPLedDriver::setHue(uint8_t value) {
+void ESPFastLedDriver::setHue(uint8_t value) {
 
 }
-uint8_t ESPLedDriver::getHue() {
+uint8_t ESPFastLedDriver::getHue() {
   return _gHue;
 }
 
-void ESPLedDriver::run(uint8_t delay) {
+void ESPFastLedDriver::run(uint8_t delay) {
   // Add entropy to random number generator; we use a lot of it.
   random16_add_entropy(random(65535));
 

@@ -27,7 +27,7 @@ extern "C" {
 */
 #include <IRremoteESP8266.h>
 #include "ESPWifiDriver.h"
-#include "ESPLedDriver.h"
+#include "ESPFastLedDriver.h"
 #include "ESPWebDriver.h"
 
 
@@ -78,7 +78,7 @@ Config End
 
 
 ESPWifiDriver wifidriver(hostname);
-ESPLedDriver leddriver;
+ESPFastLedDriver leddriver;
 ESPWebDriver webdriver(&leddriver);
 
 /* IR Driver not tested */

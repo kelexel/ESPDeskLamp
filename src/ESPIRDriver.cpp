@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "ESPIRDriver.h"
 
-ESPIRDriver::ESPIRDriver(IRrecv* irReceiver, ESPLedDriver* ledDriver) {
+ESPIRDriver::ESPIRDriver(IRrecv* irReceiver, ESPFastLedDriver* ledDriver) {
   _ledDriver = ledDriver;
   _irReceiver = irReceiver;
 }

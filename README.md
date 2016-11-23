@@ -4,16 +4,17 @@ FastLED + ESP8266 Async Web Server
 Features
 --------
 * Control one (or more ?) addressable LED strip(s) with an ESP8266 compatible board.
-* Works with *homebridge-better-http-rgb*, so yes, this means *Siri & Homekit support*.
-* HTTP UI, borrowed from the original esp8266-fastled-webserver project, for now. I need to add debounce to click events, possibly use a more mobile centric JS/CSS FW, and of course, websockets <o/
-* 10 animations from the FastLED showreel.
-* Built with Platformio: use Platformio to build and flash the esp8266
-* Set Power, Brightness, Speed, Hue, Palette, Pattern via the HTTP (async!) API
+* Uses [[FastLED](http://fastled.io/)]
+* Works with [[homebridge-better-http-rgb]()], so yes, this means *Siri & Homekit support*.
+* HTTP UI, borrowed from the original [[FastLED + ESP8266 Web Server](https://github.com/jasoncoon/esp8266-fastled-webserver)] project, for now. I need to add debounce to click events, possibly use a more mobile centric JS/CSS FW, and of course, websockets <o/
+* 10 animations from the [[FastLED DemoReel](https://github.com/FastLED/FastLED/tree/master/examples/DemoReel100)].
+* Built with [[Platformio](http://platformio.org)]: use Platformio to build and flash the esp8266
+* Set Power, Brightness, Speed, Hue, Palette, Pattern via an API running on [[ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer)] (async! yay!)
 
 
 About
 -----
-This is a humble rewrite attempt of [[FastLED + ESP8266 Web Server](https://github.com/jasoncoon/esp8266-fastled-webserver)] by *Jason Coon*
+This is a humble rewrite attempt of [[FastLED + ESP8266 Web Server](https://github.com/jasoncoon/esp8266-fastled-webserver)] by *Jason Coon*.
 
 It also includes [[ColorWavesWithPalettes]( https://gist.github.com/kriegsman/8281905786e8b2632aeb)] by *Mark Kriegsman*
 
@@ -28,8 +29,8 @@ A crash course into C++ classes
 ---------
 * Again, again, again, this is my first attempt at some C++ code. Some methods can probably be refactored.
 * *ESPWifiDriver* is a class made to handle the basic network stack: act as an access point, or act as a wifi client, advertise the services using mDNS. It might become Singleton...
-* *ESPLedDriver* is a class made to handle the FastLED settings, animations, and palettes.
-* *ESPWebDriver* is a class made to handle HTTP requests, and invoke the ESPLedDriver accordingly. It might also become a Singleton
+* *ESPFastLedDriver* is a class made to handle the FastLED settings, animations, and palettes.
+* *ESPWebDriver* is a class made to handle HTTP requests, and invoke the ESPFastLedDriver accordingly. It might also become a Singleton
 * *ESPIRDriver* is garbage for now
 
 
@@ -37,9 +38,10 @@ A crash course into C++ classes
 TODO:
 -----
 * A massive code cleanup. This should happen soon.
-* IR support from the original "FastLED + ESP8266 Web Server"
-* MQTT support
-* ESPLedDriver::hexToRGB and ESPLedDriver::RGBToHex probably need a rewrite to improve conversion speed.
+* Make ESP*PixelBus*Driver Class (probably using an ESPLedDriver abstract class), and let you chose which you prefer ;)
+* MQTT support via [[async-mqtt-client](https://github.com/marvinroger/async-mqtt-client)]
+* IR support like, the original "FastLED + ESP8266 Web Server" project
+* ESPFastLedDriver::hexToRGB and ESPFastLedDriver::RGBToHex probably need a rewrite to improve conversion speed.
 * It crashes from time to time, not sure -yet- why..
 * *ESPWifiDriver* works well (I think ?)
 * The *ESPIRDriver* is roughly a class, for now.
@@ -131,3 +133,4 @@ References
 * http://internetofhomethings.com/homethings/?p=396
 * http://docs.platformio.org/en/stable/platforms/espressif8266.html#uploading-files-to-file-system-spiffs
 * http://docs.platformio.org/en/stable/platforms/espressif8266.html#platform-espressif-customflash
+* https://github.com/me-no-dev/ESPAsyncWebServer

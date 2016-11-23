@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include "ESPWebDriver.h"
-// #include "ESPLedDriver.h"
+// #include "ESPFastLedDriver.h"
 // #include <ESPAsyncTCP.h>
 // #include <ESPAsyncWebServer.h>
 
@@ -9,7 +9,7 @@ AsyncWebServer _server(80);
 
 
 
-ESPWebDriver::ESPWebDriver(ESPLedDriver* ledDriver) {
+ESPWebDriver::ESPWebDriver(ESPFastLedDriver* ledDriver) {
   _ledDriver = ledDriver;
 }
 void ESPWebDriver::begin() {

@@ -29,10 +29,10 @@ FASTLED_USING_NAMESPACE
 
 
 
-  class ESPLedDriver
+  class ESPFastLedDriver
   {
   public:
-    ESPLedDriver();
+    ESPFastLedDriver();
     void setup();
     uint8_t getPower();
     void setPower(uint8_t power);
@@ -109,7 +109,7 @@ FASTLED_USING_NAMESPACE
 
 
     // typedef void (*Pattern)();
-    // // typedef void (ESPLedDriver::* Pattern)();
+    // // typedef void (ESPFastLedDriver::* Pattern)();
     // typedef Pattern PatternList[];
     //
     // typedef struct {

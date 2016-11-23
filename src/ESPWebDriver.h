@@ -4,16 +4,16 @@
 #include <Hash.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-#include <ESPLedDriver.h>
+#include <ESPFastLedDriver.h>
 
 class ESPWebDriver
 {
   public:
-    ESPWebDriver(ESPLedDriver* ledDriver);
+    ESPWebDriver(ESPFastLedDriver* ledDriver);
     void begin();
     void setRoutes();
   private:
-    ESPLedDriver* _ledDriver;
+    ESPFastLedDriver* _ledDriver;
 };
 
 #endif
