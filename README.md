@@ -1,53 +1,53 @@
 FastLED + ESP8266 Async Web Server
 =========
 
-Control an addressable LED strip with an ESP8266 via a web browser or infrared remote control, or MQTT, or homekit.
+Features
+--------
+* Control one (or more ?) addressable LED strip(s) with an ESP8266 compatible board.
+* Works with *homebridge-better-http-rgb*, so yes, this means *Siri & Homekit support*.
+* HTTP UI, borrowed from the original esp8266-fastled-webserver project, for now. I need to add debounce to click events, possibly use a more mobile centric JS/CSS FW, and of course, websockets <o/
+* 10 animations from the FastLED showreel.
+* Built with Platformio: use Platformio to build and flash the esp8266
+* Set Power, Brightness, Speed, Hue, Palette, Pattern via the HTTP (async!) API
 
-* Built with Platformio
-* Works with *homebridge-better-http-rgb* (yay!), see below.
 
-Purpose
--------
+About
+-----
+This is a humble rewrite attempt of [[FastLED + ESP8266 Web Server](https://github.com/jasoncoon/esp8266-fastled-webserver)] by *Jason Coon*
 
-This is a humble rewrite attempt of FastLED + ESP8266 Web Server by Jason Coon: https://github.com/jasoncoon/esp8266-fastled-webserver
-
-It also includes ColorWavesWithPalettes by Mark Kriegsman: https://gist.github.com/kriegsman/8281905786e8b2632aeb
-
+It also includes [[ColorWavesWithPalettes]( https://gist.github.com/kriegsman/8281905786e8b2632aeb)] by *Mark Kriegsman*
 
 The original code relied on the regular WebServer package for the ESP, which as you probably know, doesn't play really well if you query it too frequently...
 
 The idea is to use ESPAsyncWebServer instead, which as the name implies, runs asynchronously and, in general, works pretty well.
 
-Features
---------
+This is my first attempt at writing C++ code, so expect to find many mistakes... Please, feel free to fork and make a PR...
 
-Currently, none that make this usable.
-* *ESPWifiDriver* is a class made to handle the basic network stack: act as an access point, or act as a wifi client, advertise the services using mDNS (except mDNS is broken for now)
+
+A crash course into C++ classes
+---------
+* Again, again, again, this is my first attempt at some C++ code. Some methods can probably be refactored.
+* *ESPWifiDriver* is a class made to handle the basic network stack: act as an access point, or act as a wifi client, advertise the services using mDNS. It might become Singleton...
 * *ESPLedDriver* is a class made to handle the FastLED settings, animations, and palettes.
-* *ESPWebDriver* is a class made to handle HTTP requests, and invoke the ESPLedDriver accordingly.
-* *ESPIRDriver* is a class made to handle IR remote codes, and invoke the ESPLedDriver accordingly.
+* *ESPWebDriver* is a class made to handle HTTP requests, and invoke the ESPLedDriver accordingly. It might also become a Singleton
+* *ESPIRDriver* is garbage for now
 
 
-I plan to include the following:
+
+TODO:
+-----
+* A massive code cleanup. This should happen soon.
 * IR support from the original "FastLED + ESP8266 Web Server"
 * MQTT support
-* HTTP Ui support, either from the original "FastLED + ESP8266 Web Server" or a home baked one.
-
-
-Status
-------
-
 * ESPLedDriver::hexToRGB and ESPLedDriver::RGBToHex probably need a rewrite to improve conversion speed.
-* It crashes from time to time, not sure -yet- why.
-* MDNS isn't working, I need to dig why, but I hope *ESPWifiDriver* kind of works
+* It crashes from time to time, not sure -yet- why..
+* *ESPWifiDriver* works well (I think ?)
 * The *ESPIRDriver* is roughly a class, for now.
-* This is my first attempt at writing C++ code, so expect to find many mistakes... Please, feel free to fork and make a PR...
 
 
 Install
 -------
-
-Download Platformio from http://platformio.org
+Download Platformio from [[here](http://platformio.org)]
 
 Note if you are using Atom already, I recommend you get their Atom based IDE..
 
@@ -64,7 +64,20 @@ Install the following libraries using `pio lib update`
 * IRremoteESP8266
 * esp8266_mdns
 
-Than build and flash
+Than build and flash.
+
+
+Flash SPIFFS to esp8266:
+------------------------
+Open a terminal in Platformio IDE.
+
+Type: `platformio run --target buildfs` to build the filesystem image.
+
+Type `platformio run --target uploadfs` to upload the image to the esp8266.
+
+Note:
+I currently added the ESP-01 1M/512K flags in platformio.ini, you might want to adjust to your board, see Platformio docs:
+[[uploading-files-to-file-system-spiffs](http://docs.platformio.org/en/stable/platforms/espressif8266.html#uploading-files-to-file-system-spiffs)] and [[platform-espressif-customflash](http://docs.platformio.org/en/stable/platforms/espressif8266.html#platform-espressif-customflash)]
 
 
 homebridge-better-http-rgb setup
@@ -116,3 +129,5 @@ References
 
 * https://github.com/jasoncoon/esp8266-fastled-webserver
 * http://internetofhomethings.com/homethings/?p=396
+* http://docs.platformio.org/en/stable/platforms/espressif8266.html#uploading-files-to-file-system-spiffs
+* http://docs.platformio.org/en/stable/platforms/espressif8266.html#platform-espressif-customflash

@@ -5,8 +5,6 @@
 
 
 ESPLedDriver::ESPLedDriver() {
-    setPower(1);
-    setBrightness(100);
     _gCurrentPalette = CRGBPalette16( CRGB::Black);
     _gTargetPalette = CRGBPalette16( gGradientPalettes[0] );
 }
@@ -29,14 +27,17 @@ ESPLedDriver::ESPLedDriver() {
 // }
 //
 void ESPLedDriver::setup() {
+  // setPower(1);
+  // setBrightness(100);
   loadSettings();
   FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(_leds, NUM_LEDS);         // for WS2812 (Neopixel)
-  //FastLED.addLeds<LED_TYPE,DATA_PIN,CLK_PIN,COLOR_ORDER>(leds, NUM_LEDS); // for APA102 (Dotstar)
+
   FastLED.setCorrection(TypicalLEDStrip);
-  FastLED.setBrightness(_brightness);
   FastLED.setMaxPowerInVoltsAndMilliamps(5, MILLI_AMPS);
 
+  FastLED.setBrightness(_brightness);
   fill_solid(_leds, NUM_LEDS, _solidColor);
+
   FastLED.show();
 }
 
@@ -81,6 +82,11 @@ void ESPLedDriver::loadSettings()
 
   _speed = EEPROM.read(5);
 
+  if (_speed = 0) {
+    _speed = 40;
+    _speedIndex = 3;
+  }
+
   if (r == 0 && g == 0 && b == 0)
   {
     _solidColor = CRGB::Blue;
@@ -103,6 +109,7 @@ uint8_t ESPLedDriver::getPower() {
 void ESPLedDriver::setPower(uint8_t value) {
   if (_power != value) {
     _power = value;
+    _powerIsDown = false;
     if (value == 1) {
       fill_solid(_leds, NUM_LEDS, _solidColor);
     }
@@ -195,10 +202,8 @@ void ESPLedDriver::setSpeed(uint8_t value)
 
   _speed = value;
 
-//  FastLED.setSpeed(speed);
-
-//  EEPROM.write(0, brightness);
-//  EEPROM.commit();
+ EEPROM.write(5, _speed);
+ EEPROM.commit();
 }
 
 
@@ -246,6 +251,19 @@ void ESPLedDriver::adjustPattern(bool up)
   EEPROM.write(1, _currentPatternIndex);
   EEPROM.commit();
 }
+uint8_t ESPLedDriver::getCurrentPattern()
+{
+  return _currentPatternIndex;
+}
+String ESPLedDriver::getCurrentPatternJson()
+{
+  String json = "{";
+  json += "\"index\":" + String(_currentPatternIndex);
+  json += ",\"name\":\"" + String(_patterns[_currentPatternIndex]) + "\"";
+  json += "}";
+  return json;
+}
+
 
 void ESPLedDriver::setPattern(int value)
 {
@@ -309,6 +327,10 @@ animations
 //   //   // { this->showSolidColor, "Solid Color" },
 //   // };
 // }
+void ESPLedDriver::ack()
+{
+  addGlitter(100);
+}
 void ESPLedDriver::showSolidColor()
 {
   fill_solid(_leds, NUM_LEDS, _solidColor);
@@ -477,11 +499,79 @@ void ESPLedDriver::palettetest()
   fill_palette( _leds, NUM_LEDS, startindex, (256 / NUM_LEDS) + 1, _gCurrentPalette, 255, LINEARBLEND);
 }
 
+// adapted from http://www.tweaking4all.com/hardware/arduino/adruino-led-strip-effects/#fire
+void ESPLedDriver::fire(int Cooling, int Sparking, int SpeedDelay) {
+// void ESPLedDriver::fire(int Cooling, int Sparking) {
+  static byte heat[NUM_LEDS];
+  int cooldown;
+
+  // Step 1.  Cool down every cell a little
+  for( int i = 0; i < NUM_LEDS; i++) {
+    cooldown = random(0, ((Cooling * 10) / NUM_LEDS) + 2);
+
+    if(cooldown>heat[i]) {
+      heat[i]=0;
+    } else {
+      heat[i]=heat[i]-cooldown;
+    }
+  }
+
+  // Step 2.  Heat from each cell drifts 'up' and diffuses a little
+  for( int k= NUM_LEDS - 1; k >= 2; k--) {
+    heat[k] = (heat[k - 1] + heat[k - 2] + heat[k - 2]) / 3;
+  }
+
+  // Step 3.  Randomly ignite new 'sparks' near the bottom
+  if( random(255) < Sparking ) {
+    int y = random(7);
+    heat[y] = heat[y] + random(160,255);
+    //heat[y] = random(160,255);
+  }
+
+  // Step 4.  Convert heat to LED colors
+  for( int j = 0; j < NUM_LEDS; j++) {
+    setPixelHeatColor(j, heat[j] );
+  }
+  FastLED.delay(SpeedDelay);
+}
+
+void ESPLedDriver::setPixelHeatColor (int Pixel, byte temperature) {
+  // Scale 'heat' down from 0-255 to 0-191
+  byte t192 = round((temperature/255.0)*191);
+
+  // calculate ramp up from
+  byte heatramp = t192 & 0x3F; // 0..63
+  heatramp <<= 2; // scale up to 0..252
+
+  // figure out which third of the spectrum we're in:
+  if( t192 > 0x80) {                     // hottest
+    // setPixel(Pixel, 255, 255, heatramp);
+    _leds[Pixel] = CRGB( 255, 255, heatramp);
+
+  } else if( t192 > 0x40 ) {             // middle
+    // setPixel(Pixel, 255, heatramp, 0);
+    _leds[Pixel] = CRGB( 255, heatramp, 0);
+  } else {                               // coolest
+    // setPixel(Pixel, heatramp, 0, 0);
+    _leds[Pixel] = CRGB( heatramp, 0, 0);
+  }
+}
+
+
+
+
+
+
+
+
 // struct CRGBPalette16 ESPLedDriver::getCurrentPalette() {
 //   return _gCurrentPalette;
 // }
 uint8_t ESPLedDriver::getGHue() {
   return _gHue;
+}
+uint8_t ESPLedDriver::getSpeed() {
+  return _speed;
 }
 struct CRGB ESPLedDriver::getLeds() {
   // return _leds;
@@ -497,7 +587,7 @@ String ESPLedDriver::getStatus()
 
   json += "\"currentPattern\":{";
   json += "\"index\":" + String(_currentPatternIndex);
-  //json += ",\"name\":\"" + _patterns[_currentPatternIndex].name + "\"}";
+  json += ",\"name\":\"" + String(_patterns[_currentPatternIndex]) + "\"}";
 
   json += ",\"solidColor\":{";
   json += "\"r\":" + String(_solidColor.r);
@@ -506,12 +596,13 @@ String ESPLedDriver::getStatus()
   json += "}";
 
   json += ",\"patterns\":[";
-  // for (uint8_t i = 0; i < _patternCount; i++)
-  // {
-  //   json += "\"" + _patterns[i].name + "\"";
-  //   if (i < _patternCount - 1)
-  //     json += ",";
-  // }
+  for (uint8_t i = 0; i < _patternCount; i++)
+  {
+    json += "\"" + String(_patterns[i]) + "\"";
+    // json += "\"foo\"";
+    if (i < _patternCount - 1)
+      json += ",";
+  }
   json += "]";
 
   json += "}";
@@ -538,29 +629,52 @@ String ESPLedDriver::RGBToHex(struct CRGB rgbColor) {
 }
 
 
+void ESPLedDriver::setPalette(uint8_t value) {
+
+}
+uint8_t ESPLedDriver::getCurrentPalette() {
+  return _gCurrentPaletteNumber;
+}
+void ESPLedDriver::setHue(uint8_t value) {
+
+}
+uint8_t ESPLedDriver::getHue() {
+  return _gHue;
+}
+
 void ESPLedDriver::run(uint8_t delay) {
   // Add entropy to random number generator; we use a lot of it.
   random16_add_entropy(random(65535));
 
-  EVERY_N_MILLISECONDS( 20 ) {
+  // EVERY_N_MILLISECONDS( 40 ) {
+  EVERY_N_MILLISECONDS( _speed ) {
     _gHue++;  // slowly cycle the "base color" through the rainbow
   }
 
   // change to a new cpt-city gradient palette
-  EVERY_N_SECONDS( _secondsPerPalette ) {
+  EVERY_N_SECONDS( _palettesPerSecond ) {
     _gCurrentPaletteNumber = addmod8( _gCurrentPaletteNumber, 1, gGradientPaletteCount);
     _gTargetPalette = gGradientPalettes[ _gCurrentPaletteNumber ];
   }
 
   // slowly blend the current cpt-city gradient palette to the next
-  EVERY_N_MILLISECONDS(40) {
+  // EVERY_N_MILLISECONDS(80) {
+  EVERY_N_MILLISECONDS(_speed*2) {
     nblendPaletteTowardPalette( _gCurrentPalette, _gTargetPalette, 16);
   }
 
-  if (_power == 0) {
+  if (_autoplayEnabled && millis() > _autoPlayTimeout) {
+    adjustPattern(true);
+    _autoPlayTimeout = millis() + (_autoPlayDurationSeconds * 1000);
+  }
+
+  if (_power == 0 && !_powerIsDown) {
     // Serial.println("POWER OFF");
     fill_solid(_leds, NUM_LEDS, CRGB::Black);
     FastLED.show();
+    _powerIsDown = true;
+  } else if (_power == 0 && _powerIsDown) {
+    // do nothing power is down!
   } else {
     switch(_currentPatternIndex) {
       case 0: showSolidColor(); break;
@@ -572,14 +686,10 @@ void ESPLedDriver::run(uint8_t delay) {
       case 6: bpm(); break;
       case 7: juggle(); break;
       case 8: pride(); break;
-      case 9: colorwaves(); break;
-      case 10: palettetest(); break;
+      case 9: palettetest(); break;
+      case 10: fire(55,120,15); break;
     }
+    FastLED.show();
+    FastLED.delay(delay);
   }
-  FastLED.show();
-  // fill_solid(leddriver._leds, NUM_LEDS, leddriver.getSolidColor());
-  // fill_solid(_leds, NUM_LEDS, _solidColor);
-  // insert a delay to keep the framerate modest
-  //FastLED.delay(1000 / FRAMES_PER_SECOND);
-  FastLED.delay(delay);
 }

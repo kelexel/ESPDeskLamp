@@ -6,13 +6,15 @@
 class ESPWifiDriver
 {
   public:
-    ESPWifiDriver();
-    void setupAP(const String hostname, const char* apWifiPSK);
-    void setupClient(const String hostname, const char* ssid, const char* password);
+    ESPWifiDriver(const String hostname);
+    void setupAP(const char* apWifiPSK);
+    void setupClient(const char* ssid, const char* password);
     void setupClientNetwork(IPAddress ip, IPAddress netmask, IPAddress gateway);
-    void setupMDNS(const String hostname);
+    String formatHostname(const String hostname);
+    void setupMDNS();
   private:
     bool _apMode;
+    String _hostname;
 };
 
 #endif

@@ -12,7 +12,6 @@ class ESPWebDriver
     ESPWebDriver(ESPLedDriver* ledDriver);
     void begin();
     void setRoutes();
-    void handleRoot(AsyncWebServerRequest *request);
   private:
     ESPLedDriver* _ledDriver;
 };

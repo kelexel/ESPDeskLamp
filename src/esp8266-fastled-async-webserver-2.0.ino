@@ -1,5 +1,8 @@
 #include <Arduino.h>
 #include <EEPROM.h>
+extern "C" {
+#include "user_interface.h"
+}
 
 /*
 * esp8266-fastled-async-webserver
@@ -34,7 +37,7 @@ Config Start
 */
 
 // Hostname for the Lmp
-const String hostname = "TestLamp";
+const String hostname = "DeskLamp";
 
 
 /*
@@ -74,7 +77,7 @@ Config End
 
 
 
-ESPWifiDriver wifidriver;
+ESPWifiDriver wifidriver(hostname);
 ESPLedDriver leddriver;
 ESPWebDriver webdriver(&leddriver);
 
@@ -90,36 +93,43 @@ void setup() {
   Serial.begin(115200);
   EEPROM.begin(512);
 
+  Serial.println();
+  Serial.print( F("Heap: ") ); Serial.println(system_get_free_heap_size());
+  Serial.print( F("Boot Vers: ") ); Serial.println(system_get_boot_version());
+  Serial.print( F("CPU: ") ); Serial.println(system_get_cpu_freq());
+  Serial.print( F("SDK: ") ); Serial.println(system_get_sdk_version());
+  Serial.print( F("Chip ID: ") ); Serial.println(system_get_chip_id());
+  Serial.print( F("Flash ID: ") ); Serial.println(spi_flash_get_id());
+  Serial.print( F("Flash Size: ") ); Serial.println(ESP.getFlashChipRealSize());
+  Serial.print( F("Vcc: ") ); Serial.println(ESP.getVcc());
+  Serial.println();
+
+  SPIFFS.begin();
+  {
+    Dir dir = SPIFFS.openDir("/");
+    while (dir.next()) {
+      String fileName = dir.fileName();
+      size_t fileSize = dir.fileSize();
+      Serial.printf("FS File: %s, size: %s\n", fileName.c_str(), String(fileSize).c_str());
+    }
+    Serial.printf("\n");
+  }
+
   // Start the wifi driver in either AP or Client mode
   if (apMode) {
-    wifidriver.setupAP(hostname, apWifiPSK);
+    wifidriver.setupAP(apWifiPSK);
   } else {
     if (!clientUseDHCP) {
       wifidriver.setupClientNetwork(ip, gateway, netmask);
     }
-    wifidriver.setupClient(hostname, ssid, password);
+    wifidriver.setupClient(ssid, password);
   }
-  wifidriver.setupMDNS(hostname);
+  wifidriver.setupMDNS();
   leddriver.setup();
   webdriver.setRoutes();
   webdriver.begin();
 }
 
 void loop() {
-  leddriver.run(100);
-  // if (leddriver.getPower() == 0) {
-  //   // Serial.println("POWER OFF");
-  //   fill_solid(leddriver._leds, NUM_LEDS, CRGB::Black);
-  //   FastLED.show();
-  //   FastLED.delay(15);
-  //   return;
-  // }
-  // FastLED.show();
-  //
-  // // fill_solid(leddriver._leds, NUM_LEDS, leddriver.getSolidColor());
-  // // fill_solid(_leds, NUM_LEDS, _solidColor);
-  // // insert a delay to keep the framerate modest
-  // //FastLED.delay(1000 / FRAMES_PER_SECOND);
-  // FastLED.delay(100);
-
+  leddriver.run(30);
 }
