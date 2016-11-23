@@ -1,7 +1,7 @@
 ESP Desk Lamp
 =============
 
-An ESP8266 and FastLED desk lamp.
+An ESP8266 and FastLED desk *animated* lamp with support for HTTP and Homekit (via) Homebridge
 
 
 
@@ -19,12 +19,9 @@ And bits of codes from many sources I (try to) reference in the source code.
 
 This is my first attempt at writing C++ code, so expect to find many mistakes... Incoherences... Stupidity...
 
-Please, feel free to fork this project.
+Please, feel free to fork this project, make a PR, or open a ticket in the Issues section.
 
-Make a PR, or open a ticket in the Issues section.
-
-Rudolph Sand (Kelexel)
-11/23/2016
+*11/23/2016* - Rudolph Sand (Kelexel)
 
 
 Features
