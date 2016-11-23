@@ -26,8 +26,6 @@
 #include "ESPWifiDriver.h"
 #include "ESPLedDriver.h"
 #include "ESPWebDriver.h"
-#include "ESPIRDriver.h"
-#include "Animation.h"
 
 
 
@@ -62,6 +60,8 @@ IPAddress gateway(192, 168, 6, 253);
 IPAddress netmask(255, 255, 255, 0);
 
 
+
+
 /*
 Config End
 */
@@ -79,6 +79,7 @@ ESPLedDriver leddriver;
 ESPWebDriver webdriver(&leddriver);
 
 /* IR Driver not tested */
+// #include "ESPIRDriver.h"
 // #define RECV_PIN 12
 // IRrecv irReceiver(RECV_PIN);
 // ESPIRDriver irdriver(&irReceiver, &leddriver);
@@ -105,20 +106,20 @@ void setup() {
 }
 
 void loop() {
-  // leddriver.run();
-  if (leddriver.getPower() == 0) {
-    // Serial.println("POWER OFF");
-    fill_solid(leddriver._leds, NUM_LEDS, CRGB::Black);
-    FastLED.show();
-    FastLED.delay(15);
-    return;
-  }
-  FastLED.show();
-
-  // fill_solid(leddriver._leds, NUM_LEDS, leddriver.getSolidColor());
-  // fill_solid(_leds, NUM_LEDS, _solidColor);
-  // insert a delay to keep the framerate modest
-  //FastLED.delay(1000 / FRAMES_PER_SECOND);
-  FastLED.delay(100);
+  leddriver.run(100);
+  // if (leddriver.getPower() == 0) {
+  //   // Serial.println("POWER OFF");
+  //   fill_solid(leddriver._leds, NUM_LEDS, CRGB::Black);
+  //   FastLED.show();
+  //   FastLED.delay(15);
+  //   return;
+  // }
+  // FastLED.show();
+  //
+  // // fill_solid(leddriver._leds, NUM_LEDS, leddriver.getSolidColor());
+  // // fill_solid(_leds, NUM_LEDS, _solidColor);
+  // // insert a delay to keep the framerate modest
+  // //FastLED.delay(1000 / FRAMES_PER_SECOND);
+  // FastLED.delay(100);
 
 }

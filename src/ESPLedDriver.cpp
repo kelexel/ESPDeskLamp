@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <math.h>
 #include "ESPLedDriver.h"
-#include "GradientPalettes.h"
+#include <GradientPalettes.h>
 
 
 ESPLedDriver::ESPLedDriver() {
@@ -217,8 +217,7 @@ void ESPLedDriver::setSolidColor(uint8_t r, uint8_t g, uint8_t b)
   EEPROM.write(4, b);
 
   fill_solid(_leds, NUM_LEDS, _solidColor);
-  // setSolidColor(_solidColor);
-  // setPattern(_patternCount - 1);
+  setPattern(0);
 }
 CRGB ESPLedDriver::getSolidColor()
 {
@@ -269,47 +268,47 @@ void ESPLedDriver::setPattern(int value)
 /*
 animations
 */
-void ESPLedDriver::setPatterns()
-{
-  // AnimColorWaves* colorWaves = new AnimColorWaves();
-  PatternAndNameList _patterns = {
-    // { AnimColorWaves::run, "Color Waves" },
-  //   { palettetest, "Palette Test" },
-  //   { pride, "Pride" },
-  //   { rainbow, "Rainbow" },
-  //   { rainbowWithGlitter, "Rainbow With Glitter" },
-  //   { confetti, "Confetti" },
-  //   { sinelon, "Sinelon" },
-  //   { juggle, "Juggle" },
-  //   { bpm, "BPM" },
-  //   { showSolidColor, "Solid Color" },
-  };
-
-  // { int new AnimColorWaves(), "Color Waves" },
-
-  // const uint8_t patternCount;
-  // const PROGMEM  String  variableName[] = {
-  //   "a", "b"
-  // }; // or this form
-  //
-  // int patterns[2] = {
-  //
-  //   // no luck: src/ESPLedDriver.cpp:225:3: error: cannot convert 'ESPLedDriver::colorwaves' from type 'void (ESPLedDriver::)()' to type 'ESPLedDriver::Pattern {aka void (*)()}'
-  //   { colorwaves, "Color Waves" },
-  //
-  //   // no luck: src/ESPLedDriver.cpp:225:3: error: cannot convert 'ESPLedDriver::palettetest' from type 'void (ESPLedDriver::)()' to type 'ESPLedDriver::Pattern {aka void (*)()}'
-  //   { this->palettetest, "Palette Test" }
-  //
-  //   // { this->pride, "Pride" },
-  //   // { this->rainbow, "Rainbow" },
-  //   // { this->rainbowWithGlitter, "Rainbow With Glitter" },
-  //   // { this->confetti, "Confetti" },
-  //   // { this->sinelon, "Sinelon" },
-  //   // { this->juggle, "Juggle" },
-  //   // { this->bpm, "BPM" },
-  //   // { this->showSolidColor, "Solid Color" },
+// void ESPLedDriver::setPatterns()
+// {
+//   // AnimColorWaves* colorWaves = new AnimColorWaves();
+  // PatternAndNameList _patterns = {
+  //   // { AnimColorWaves::run, "Color Waves" },
+  // //   { palettetest, "Palette Test" },
+  // //   { pride, "Pride" },
+  // //   { rainbow, "Rainbow" },
+  // //   { rainbowWithGlitter, "Rainbow With Glitter" },
+  // //   { confetti, "Confetti" },
+  // //   { sinelon, "Sinelon" },
+  // //   { juggle, "Juggle" },
+  // //   { bpm, "BPM" },
+  // //   { showSolidColor, "Solid Color" },
   // };
-}
+//
+//   // { int new AnimColorWaves(), "Color Waves" },
+//
+//   // const uint8_t patternCount;
+//   // const PROGMEM  String  variableName[] = {
+//   //   "a", "b"
+//   // }; // or this form
+//   //
+//   // int patterns[2] = {
+//   //
+//   //   // no luck: src/ESPLedDriver.cpp:225:3: error: cannot convert 'ESPLedDriver::colorwaves' from type 'void (ESPLedDriver::)()' to type 'ESPLedDriver::Pattern {aka void (*)()}'
+//   //   { colorwaves, "Color Waves" },
+//   //
+//   //   // no luck: src/ESPLedDriver.cpp:225:3: error: cannot convert 'ESPLedDriver::palettetest' from type 'void (ESPLedDriver::)()' to type 'ESPLedDriver::Pattern {aka void (*)()}'
+//   //   { this->palettetest, "Palette Test" }
+//   //
+//   //   // { this->pride, "Pride" },
+//   //   // { this->rainbow, "Rainbow" },
+//   //   // { this->rainbowWithGlitter, "Rainbow With Glitter" },
+//   //   // { this->confetti, "Confetti" },
+//   //   // { this->sinelon, "Sinelon" },
+//   //   // { this->juggle, "Juggle" },
+//   //   // { this->bpm, "BPM" },
+//   //   // { this->showSolidColor, "Solid Color" },
+//   // };
+// }
 void ESPLedDriver::showSolidColor()
 {
   fill_solid(_leds, NUM_LEDS, _solidColor);
@@ -478,9 +477,9 @@ void ESPLedDriver::palettetest()
   fill_palette( _leds, NUM_LEDS, startindex, (256 / NUM_LEDS) + 1, _gCurrentPalette, 255, LINEARBLEND);
 }
 
-uint8_t ESPLedDriver::getCurrentPalette() {
-  return _gCurrentPaletteNumber;
-}
+// struct CRGBPalette16 ESPLedDriver::getCurrentPalette() {
+//   return _gCurrentPalette;
+// }
 uint8_t ESPLedDriver::getGHue() {
   return _gHue;
 }
@@ -539,18 +538,48 @@ String ESPLedDriver::RGBToHex(struct CRGB rgbColor) {
 }
 
 
-void ESPLedDriver::run() {
+void ESPLedDriver::run(uint8_t delay) {
+  // Add entropy to random number generator; we use a lot of it.
+  random16_add_entropy(random(65535));
+
+  EVERY_N_MILLISECONDS( 20 ) {
+    _gHue++;  // slowly cycle the "base color" through the rainbow
+  }
+
+  // change to a new cpt-city gradient palette
+  EVERY_N_SECONDS( _secondsPerPalette ) {
+    _gCurrentPaletteNumber = addmod8( _gCurrentPaletteNumber, 1, gGradientPaletteCount);
+    _gTargetPalette = gGradientPalettes[ _gCurrentPaletteNumber ];
+  }
+
+  // slowly blend the current cpt-city gradient palette to the next
+  EVERY_N_MILLISECONDS(40) {
+    nblendPaletteTowardPalette( _gCurrentPalette, _gTargetPalette, 16);
+  }
+
   if (_power == 0) {
     // Serial.println("POWER OFF");
     fill_solid(_leds, NUM_LEDS, CRGB::Black);
     FastLED.show();
-    FastLED.delay(15);
-    return;
+  } else {
+    switch(_currentPatternIndex) {
+      case 0: showSolidColor(); break;
+      case 1: colorwaves(); break;
+      case 2: rainbow(); break;
+      case 3: rainbowWithGlitter(); break;
+      case 4: confetti(); break;
+      case 5: sinelon(); break;
+      case 6: bpm(); break;
+      case 7: juggle(); break;
+      case 8: pride(); break;
+      case 9: colorwaves(); break;
+      case 10: palettetest(); break;
+    }
   }
-  // FastLED.show();
-
+  FastLED.show();
+  // fill_solid(leddriver._leds, NUM_LEDS, leddriver.getSolidColor());
   // fill_solid(_leds, NUM_LEDS, _solidColor);
   // insert a delay to keep the framerate modest
   //FastLED.delay(1000 / FRAMES_PER_SECOND);
-  // FastLED.delay(1000 / 100);
+  FastLED.delay(delay);
 }

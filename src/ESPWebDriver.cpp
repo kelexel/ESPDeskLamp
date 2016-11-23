@@ -92,6 +92,20 @@ void ESPWebDriver::setRoutes() {
     }
   });
 
+  _server.on("/pattern", HTTP_POST, [this](AsyncWebServerRequest *request){
+    if(request->hasArg("value")) {
+      Serial.print("Pattern: ");
+      String pattern = request->arg("value");
+      Serial.println(String(pattern));
+      _ledDriver->setPattern(pattern.toInt());
+      request->send(200, "text/plain", String(pattern));
+    } else {
+      Serial.println("Invalid arg received for /pattern");
+      request->send(200, "text/plain", String("Error"));
+    }
+  });
+
+
   _server.serveStatic("/index.htm", SPIFFS, "/index.htm");
   _server.serveStatic("/fonts", SPIFFS, "/fonts", "max-age=86400");
   _server.serveStatic("/js", SPIFFS, "/js");
