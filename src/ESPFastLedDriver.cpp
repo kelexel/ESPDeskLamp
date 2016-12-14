@@ -1,12 +1,11 @@
 #include <Arduino.h>
-#include <math.h>
 #include "ESPFastLedDriver.h"
 #include <GradientPalettes.h>
 
 
 ESPFastLedDriver::ESPFastLedDriver() {
-    _gCurrentPalette = CRGBPalette16( CRGB::Black);
-    _gTargetPalette = CRGBPalette16( gGradientPalettes[0] );
+  _gCurrentPalette = CRGBPalette16( CRGB::Black);
+  _gTargetPalette = CRGBPalette16( gGradientPalettes[0] );
 }
 
 // void ESPFastLedDriver::setup() {
@@ -32,6 +31,7 @@ void ESPFastLedDriver::setup() {
   loadSettings();
   FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(_leds, NUM_LEDS);         // for WS2812 (Neopixel)
 
+  setPower(1);
   FastLED.setCorrection(TypicalLEDStrip);
   FastLED.setMaxPowerInVoltsAndMilliamps(5, MILLI_AMPS);
 
@@ -72,21 +72,13 @@ void ESPFastLedDriver::loadSettings()
 
   _currentPatternIndex = EEPROM.read(1);
   if (_currentPatternIndex < 0)
-    _currentPatternIndex = 0;
+  _currentPatternIndex = 0;
   else if (_currentPatternIndex >= _patternCount)
-    _currentPatternIndex = _patternCount - 1;
+  _currentPatternIndex = _patternCount - 1;
 
   byte r = EEPROM.read(2);
   byte g = EEPROM.read(3);
   byte b = EEPROM.read(4);
-
-  _speed = EEPROM.read(5);
-
-  if (_speed = 0) {
-    _speed = 40;
-    _speedIndex = 3;
-  }
-
   if (r == 0 && g == 0 && b == 0)
   {
     _solidColor = CRGB::Blue;
@@ -95,10 +87,52 @@ void ESPFastLedDriver::loadSettings()
   {
     _solidColor = CRGB(r, g, b);
   }
+
+  _gHueSpeed = EEPROM.read(5);
+  if (_gHueSpeed == 0) {
+    _gHueSpeed = 40;
+  }
+  _pChangeSpeed = EEPROM.read(6);
+  Serial.print("READ PCHANGE: ");
+  Serial.println(_pChangeSpeed);
+  if (_pChangeSpeed == 0) {
+    _pChangeSpeed = 10000;
+  }
+
+  // _gHueSpeed = EEPROM.read(6);
+  // if (_gHueSpeed == 0) {
+  // _gHueSpeed = _speed;
+  this->updateTimers();
+  // }
+
+  // _pChangeSpeed = EEPROM.read(7);
+  // if (_pChangeSpeed == 0) {
+  //   _pChangeSpeed = _speed * 2;
+  // }
+  //
+  // _pBlendingSpeed = EEPROM.read(8);
+  // if (_pBlendingSpeed == 0) {
+  //   _pBlendingSpeed = _speed * 2;
+  // }
+
+  // _gCurrentPaletteNumber = EEPROM.read(9);
 }
 
 
-
+void ESPFastLedDriver::updateTimers() {
+  // int offsetMax = 1;
+  // int offsetSpeed = 1;
+  // if (_speed < 10) { offsetMax = 30; offsetSpeed = 1.5; }
+  // else if (_speed < 40) { offsetMax = 20; offsetSpeed = 3; }
+  // else if (_speed < 100) { offsetMax = 15; offsetSpeed = 4.5; }
+  // else if (_speed < 140) { offsetMax = 10; offsetSpeed = 5.5; }
+  // else if (_speed < 200) { offsetMax = 1.1; offsetSpeed = 1; }
+  // // _gHueSpeed = 1 + round(255 * offset) - round(_speed * offset);
+  // _gHueSpeed = round(256 * offsetMax) - round(_speed * offsetSpeed);
+  //
+  // Serial.print("gHueDelay: ");
+  // Serial.println(_gHueSpeed);
+}
 /*
 Power
 */
@@ -129,15 +163,15 @@ uint8_t ESPFastLedDriver::getBrightness() {
 void ESPFastLedDriver::adjustBrightness(bool up)
 {
   if (up)
-    _brightnessIndex++;
+  _brightnessIndex++;
   else
-    _brightnessIndex--;
+  _brightnessIndex--;
 
   // wrap around at the ends
   if (_brightnessIndex < 0)
-    _brightnessIndex = _brightnessCount - 1;
+  _brightnessIndex = _brightnessCount - 1;
   else if (_brightnessIndex >= _brightnessCount)
-    _brightnessIndex = 0;
+  _brightnessIndex = 0;
 
   _brightness = _brightnessMap[_brightnessIndex];
 
@@ -151,7 +185,7 @@ void ESPFastLedDriver::setBrightness(uint8_t value) {
   // don't wrap around at the ends
   value = round(value * 2.5);
   if (value > 255)
-    value = 255;
+  value = 255;
   else if (value < 0) value = 0;
 
   _brightness = value;
@@ -171,42 +205,66 @@ void ESPFastLedDriver::setBrightness(uint8_t value) {
 Speed
 */
 
-// adjust the speed, and wrap around at the ends
-void ESPFastLedDriver::adjustSpeed(bool up)
-{
-  if (up)
-    _speedIndex++;
-  else
-    _speedIndex--;
-
-  // wrap around at the ends
-  if (_speedIndex < 0)
-    _speedIndex = _speedCount - 1;
-  else if (_speedIndex >= _speedCount)
-    _speedIndex = 0;
-
-  _speed = _speedMap[_speedIndex];
-
-//  FastLED.setBrightness(brightness);
-
-//  EEPROM.write(0, brightness);
+// // adjust the speed, and wrap around at the ends
+// void ESPFastLedDriver::adjustSpeed(bool up)
+// {
+//   if (up)
+//     _speedIndex++;
+//   else
+//     _speedIndex--;
+//
+//   // wrap around at the ends
+//   if (_speedIndex < 0)
+//     _speedIndex = _speedCount - 1;
+//   else if (_speedIndex >= _speedCount)
+//     _speedIndex = 0;
+//
+//   _speed = _speedMap[_speedIndex];
+//
+// //  FastLED.setBrightness(brightness);
+//
+//  EEPROM.write(5, _speed);
 //  EEPROM.commit();
-}
+// }
 
-void ESPFastLedDriver::setSpeed(uint8_t value)
+void ESPFastLedDriver::setSpeed(String speedType, uint8_t value)
 {
+  int maxSpeed;
+  if (speedType == "hue")
+    maxSpeed = 255;
+  else if (speedType == "palette")
+    maxSpeed = 10;
   // don't wrap around at the ends
-  if (value > 255)
-    value = 255;
-  else if (value < 0) value = 0;
+  if (value < 0) value = 0;
+  else if (value > maxSpeed)
+  value = maxSpeed;
 
-  _speed = value;
 
- EEPROM.write(5, _speed);
- EEPROM.commit();
+  if (speedType == "hue") {
+    uint8_t offsetMax = 1;
+    uint8_t offsetSpeed = 1;
+    if (value < 10) { offsetMax = 30; offsetSpeed = 1.5; }
+    else if (value < 40) { offsetMax = 20; offsetSpeed = 3; }
+    else if (value < 100) { offsetMax = 15; offsetSpeed = 4.5; }
+    else if (value < 140) { offsetMax = 10; offsetSpeed = 5.5; }
+    else if (value < 200) { offsetMax = 1.1; offsetSpeed = 1; }
+  // _gHueSpeed = 1 + round(255 * offset) - round(_speed * offset);
+    _gHueSpeed = round((maxSpeed + 1) * offsetMax) - round(value * offsetSpeed);
+    Serial.print("A: ");
+    Serial.println(_gHueSpeed);
+    EEPROM.write(5, _gHueSpeed);
+    EEPROM.commit();
+  } else if (speedType == "palette") {
+    _pChangeSpeed = value;
+    // _pChangeSpeed = round((maxSpeed + 1) * offsetMax) - round(value * offsetSpeed);
+    Serial.print("B: ");
+    Serial.println(_pChangeSpeed);
+    // _pBlendingSpeed = _pChangeSpeed + 2000;
+    EEPROM.write(6, _pChangeSpeed);
+    EEPROM.commit();
+  }
+
 }
-
-
 
 void ESPFastLedDriver::setSolidColor(CRGB color)
 {
@@ -238,15 +296,15 @@ String ESPFastLedDriver::getSolidColorHex()
 void ESPFastLedDriver::adjustPattern(bool up)
 {
   if (up)
-    _currentPatternIndex++;
+  _currentPatternIndex++;
   else
-    _currentPatternIndex--;
+  _currentPatternIndex--;
 
   // wrap around at the ends
   if (_currentPatternIndex < 0)
-    _currentPatternIndex = _patternCount - 1;
+  _currentPatternIndex = _patternCount - 1;
   if (_currentPatternIndex >= _patternCount)
-    _currentPatternIndex = 0;
+  _currentPatternIndex = 0;
 
   EEPROM.write(1, _currentPatternIndex);
   EEPROM.commit();
@@ -265,13 +323,13 @@ String ESPFastLedDriver::getCurrentPatternJson()
 }
 
 
-void ESPFastLedDriver::setPattern(int value)
+void ESPFastLedDriver::setPattern(uint8_t value)
 {
   // don't wrap around at the ends
   if (value < 0)
-    value = 0;
+  value = 0;
   else if (value >= _patternCount)
-    value = _patternCount - 1;
+  value = _patternCount - 1;
 
   _currentPatternIndex = value;
 
@@ -280,7 +338,22 @@ void ESPFastLedDriver::setPattern(int value)
 }
 
 
-
+void ESPFastLedDriver::setDelay(uint8_t type, uint8_t value) {
+  switch(type) {
+    case 0:
+    _gHueSpeed = value;
+    break;
+    case 1:
+    _pChangeSpeed = value;
+    break;
+    case 2:
+    _pBlendingSpeed = value;
+    break;
+    case 3:
+    _autoPlayDurationSeconds = value;
+    break;
+  }
+}
 
 
 /*
@@ -289,18 +362,18 @@ animations
 // void ESPFastLedDriver::setPatterns()
 // {
 //   // AnimColorWaves* colorWaves = new AnimColorWaves();
-  // PatternAndNameList _patterns = {
-  //   // { AnimColorWaves::run, "Color Waves" },
-  // //   { palettetest, "Palette Test" },
-  // //   { pride, "Pride" },
-  // //   { rainbow, "Rainbow" },
-  // //   { rainbowWithGlitter, "Rainbow With Glitter" },
-  // //   { confetti, "Confetti" },
-  // //   { sinelon, "Sinelon" },
-  // //   { juggle, "Juggle" },
-  // //   { bpm, "BPM" },
-  // //   { showSolidColor, "Solid Color" },
-  // };
+// PatternAndNameList _patterns = {
+//   // { AnimColorWaves::run, "Color Waves" },
+// //   { palettetest, "Palette Test" },
+// //   { pride, "Pride" },
+// //   { rainbow, "Rainbow" },
+// //   { rainbowWithGlitter, "Rainbow With Glitter" },
+// //   { confetti, "Confetti" },
+// //   { sinelon, "Sinelon" },
+// //   { juggle, "Juggle" },
+// //   { bpm, "BPM" },
+// //   { showSolidColor, "Solid Color" },
+// };
 //
 //   // { int new AnimColorWaves(), "Color Waves" },
 //
@@ -346,7 +419,7 @@ void ESPFastLedDriver::rainbowWithGlitter()
 {
   // built-in FastLED rainbow, plus some random sparkly glitter
   rainbow();
-  addGlitter(80);
+  addGlitter(20);
 }
 
 void ESPFastLedDriver::addGlitter( fract8 chanceOfGlitter)
@@ -501,7 +574,7 @@ void ESPFastLedDriver::palettetest()
 
 // adapted from http://www.tweaking4all.com/hardware/arduino/adruino-led-strip-effects/#fire
 void ESPFastLedDriver::fire(int Cooling, int Sparking, int SpeedDelay) {
-// void ESPFastLedDriver::fire(int Cooling, int Sparking) {
+  // void ESPFastLedDriver::fire(int Cooling, int Sparking) {
   static byte heat[NUM_LEDS];
   int cooldown;
 
@@ -532,7 +605,7 @@ void ESPFastLedDriver::fire(int Cooling, int Sparking, int SpeedDelay) {
   for( int j = 0; j < NUM_LEDS; j++) {
     setPixelHeatColor(j, heat[j] );
   }
-  FastLED.delay(SpeedDelay);
+  // FastLED.delay(SpeedDelay);
 }
 
 void ESPFastLedDriver::setPixelHeatColor (int Pixel, byte temperature) {
@@ -570,8 +643,18 @@ void ESPFastLedDriver::setPixelHeatColor (int Pixel, byte temperature) {
 uint8_t ESPFastLedDriver::getGHue() {
   return _gHue;
 }
-uint8_t ESPFastLedDriver::getSpeed() {
-  return _speed;
+uint8_t ESPFastLedDriver::getSpeed(String speedType) {
+  uint8_t retVal;
+  if (speedType == "hue")
+  retVal = _gHueSpeed;
+  else if (speedType == "palette")
+  retVal = _pChangeSpeed;
+  else retVal = 0;
+  Serial.print("getSpeed: ");
+  Serial.println(speedType);
+  Serial.print("retVal: ");
+  Serial.println(retVal);
+  return retVal;
 }
 struct CRGB ESPFastLedDriver::getLeds() {
   // return _leds;
@@ -583,7 +666,7 @@ String ESPFastLedDriver::getStatus()
 
   json += "\"power\":" + String(_power) + ",";
   json += "\"brightness\":" + String(_brightness) + ",";
-  json += "\"speed\":" + String(_speed) + ",";
+  // json += "\"speed\":" + String(_speed) + ",";
 
   json += "\"currentPattern\":{";
   json += "\"index\":" + String(_currentPatternIndex);
@@ -595,13 +678,19 @@ String ESPFastLedDriver::getStatus()
   json += ",\"b\":" + String(_solidColor.b);
   json += "}";
 
+  json += ",\"hueSpeed\":" + String(_gHueSpeed);
+  json += ",\"paletteSpeed\":" + String(round(_pChangeSpeed));
+  json += ",\"blendingSpeed\":" + String(_pBlendingSpeed);
+Serial.print("Foo ");
+Serial.println(_pChangeSpeed);
+
   json += ",\"patterns\":[";
   for (uint8_t i = 0; i < _patternCount; i++)
   {
     json += "\"" + String(_patterns[i]) + "\"";
     // json += "\"foo\"";
     if (i < _patternCount - 1)
-      json += ",";
+    json += ",";
   }
   json += "]";
 
@@ -646,22 +735,46 @@ void ESPFastLedDriver::run(uint8_t delay) {
   // Add entropy to random number generator; we use a lot of it.
   random16_add_entropy(random(65535));
 
-  // EVERY_N_MILLISECONDS( 40 ) {
-  EVERY_N_MILLISECONDS( _speed ) {
-    _gHue++;  // slowly cycle the "base color" through the rainbow
+  // // // EVERY_N_MILLISECONDS( 40 ) {
+  //   EVERY_N_MILLISECONDS( _gHueSpeed ) {
+  //   _gHue++;  // slowly cycle the "base color" through the rainbow
+  //   // Serial.println(_gHue);
+  // }
+  unsigned long currentMillis = millis();
+  if (currentMillis - _gHueSpeedPrev >= _gHueSpeed) {
+    _gHueSpeedPrev = currentMillis;
+    _gHue++;
+    // Serial.print("ghue++ ");
+    // Serial.println(_gHue);
   }
 
   // change to a new cpt-city gradient palette
-  EVERY_N_SECONDS( _palettesPerSecond ) {
+  // EVERY_N_SECONDS( _pChangeSpeed ) {
+  // EVERY_N_SECONDS( 10 ) {
+  //   Serial.println("SWITCH PALETTE!");
+  //   _gCurrentPaletteNumber = addmod8( _gCurrentPaletteNumber, 1, gGradientPaletteCount);
+  //   _gTargetPalette = gGradientPalettes[ _gCurrentPaletteNumber ];
+  // }
+  currentMillis = millis();
+  if (currentMillis - _pChangeSpeedPrev >= _pChangeSpeed*10000) {
+    // Serial.println("SWITCH PALETTE!");
+    _pChangeSpeedPrev = currentMillis;
     _gCurrentPaletteNumber = addmod8( _gCurrentPaletteNumber, 1, gGradientPaletteCount);
     _gTargetPalette = gGradientPalettes[ _gCurrentPaletteNumber ];
   }
 
   // slowly blend the current cpt-city gradient palette to the next
   // EVERY_N_MILLISECONDS(80) {
-  EVERY_N_MILLISECONDS(_speed*2) {
+  // EVERY_N_MILLISECONDS(_speed*2) {
+  EVERY_N_MILLISECONDS(100) {
     nblendPaletteTowardPalette( _gCurrentPalette, _gTargetPalette, 16);
   }
+  // currentMillis = millis();
+  // if (currentMillis - _pBlendingSpeedPrev >= _pBlendingSpeed) {
+  //   _pBlendingSpeedPrev = currentMillis;
+  //   nblendPaletteTowardPalette( _gCurrentPalette, _gTargetPalette, 16);
+  // }
+
 
   if (_autoplayEnabled && millis() > _autoPlayTimeout) {
     adjustPattern(true);
@@ -690,6 +803,12 @@ void ESPFastLedDriver::run(uint8_t delay) {
       case 10: fire(55,120,15); break;
     }
     FastLED.show();
-    FastLED.delay(delay);
+    // int rDelay = 255 - _speed + delay;
+    // Serial.println(rDelay);
+    // FastLED.delay(rDelay);
+    // FastLED.delay(delay);
+    show_at_max_brightness_for_power();                         // Run the FastLED.show() at full loop speed.
+    // Serial.println(LEDS.getFPS());                              // Display frames per second on the serial monitor.
+
   }
 }

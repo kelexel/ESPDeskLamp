@@ -13,12 +13,13 @@
 FASTLED_USING_NAMESPACE
 
 
-  #define DATA_PIN      2     // for Huzzah: Pins w/o special function:  #4, #5, #12, #13, #14; // #16 does not work :(
+  #define DATA_PIN      2     // For ESP-01
+  // #define DATA_PIN      7     // for Huzzah: Pins w/o special function:  #4, #5, #12, #13, #14; // #16 does not work :(
   #define LED_TYPE      WS2811
   #define COLOR_ORDER   GRB
   // #define COLOR_ORDER RGB
 
-  #define NUM_LEDS      64
+  #define NUM_LEDS      9
 
   #define MILLI_AMPS         2000     // IMPORTANT: set here the max milli-Amps of your power supply 5V 2A = 2000
   //#define FRAMES_PER_SECOND  speed // here you can control the speed. With the Access Point / Web Server the animations run a bit slower.
@@ -40,10 +41,10 @@ FASTLED_USING_NAMESPACE
     void adjustBrightness(bool up);
     void setBrightness(uint8_t value);
     void adjustSpeed(bool up);
-    uint8_t getSpeed();
-    void setSpeed(uint8_t value);
+    uint8_t getSpeed(String speedType);
+    void setSpeed(String type, uint8_t value);
     void adjustPattern(bool up);
-    void setPattern(int value);
+    void setPattern(uint8_t value);
     uint8_t getCurrentPattern();
     String getCurrentPatternJson();
     void setPalette(uint8_t value);
@@ -62,6 +63,8 @@ FASTLED_USING_NAMESPACE
     struct CRGB _leds[NUM_LEDS];
     struct CRGB hexToRGB(String hex);
     String RGBToHex(struct CRGB rgbColor);
+    void setDelay(uint8_t delayType, uint8_t value);
+    void updateTimers();
 
     void ack();
 
@@ -69,12 +72,6 @@ FASTLED_USING_NAMESPACE
   private:
 
     uint8_t _power;
-    uint8_t _r;
-    uint8_t _g;
-    uint8_t _b;
-    uint8_t _h;
-    uint8_t _s;
-    uint8_t _l;
 
     uint8_t _patternIndex;
 
@@ -84,12 +81,19 @@ FASTLED_USING_NAMESPACE
     int _brightnessIndex;
     uint8_t _brightness = _brightnessMap[_brightnessIndex];
 
-    static const uint8_t _speedCount = 5;
-    uint8_t _speedMap[_speedCount] = { 20, 30, 40, 50, 60 };
-    int _speedIndex = 3;
-    uint8_t _speed = _speedMap[_speedIndex];
+    // static const uint8_t _speedCount = 5;
+    // uint8_t _speedMap[_speedCount] = { 20, 30, 40, 50, 60 };
+    // int _speedIndex = 3;
+    // uint8_t _speed = _speedMap[_speedIndex];
+    // uint8_t _speed = 0;
 
-    int _palettesPerSecond = 120;
+    int _gHueSpeed = 20;
+    unsigned long _gHueSpeedPrev = 0;        // will store last time LED was updated
+
+    int _pChangeSpeed = 3000;
+    unsigned long _pChangeSpeedPrev = 0;        // will store last time LED was updated
+    int _pBlendingSpeed = 10000;
+    unsigned long _pBlendingSpeedPrev = 0;        // will store last time LED was updated
     // Current palette number from the 'playlist' of color palettes
     uint8_t _gCurrentPaletteNumber = 0;
     //
@@ -104,6 +108,8 @@ FASTLED_USING_NAMESPACE
     uint8_t _gHue = 0; // rotating "base color" used by many of the patterns
 
     struct CRGB _solidColor;
+
+
 
     // uint8_t _patternCount = 4;
 

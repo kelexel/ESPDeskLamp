@@ -5,10 +5,11 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ESP8266 + FastLED</title>
+  <title>ESPDeskLamp</title>
   <link rel="stylesheet" href="css/bootstrap.min.css">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="icon" href="images/atom196.png">
+  <meta name="viewport" content="width=device-width,  initial-scale=1, maximum-scale=1,user-scalable=no">
 </head>
 
 <body>
@@ -41,24 +42,6 @@
         </div>
       </div>
       <div class="form-group">
-        <label for="inputBrightness" class="col-sm-2 control-label">Brightness</label>
-        <div class="col-sm-6">
-          <div class="input-group">
-            <span class="input-group-addon" id="spanBrightness">128</span>
-            <input class="form-control" id="inputBrightness" type="range" step="1" min="0" max="255" />
-          </div>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="inputSpeed" class="col-sm-2 control-label">Speed</label>
-        <div class="col-sm-6">
-          <div class="input-group">
-            <span class="input-group-addon" id="spanSpeed">128</span>
-            <input class="form-control" id="inputSpeed" type="range" step="1" min="0" max="255" />
-          </div>
-        </div>
-      </div>
-      <div class="form-group">
         <label for="inputPattern" class="col-sm-2 control-label">Pattern</label>
         <div class="col-sm-6">
           <select class="form-control" id="inputPattern">
@@ -69,12 +52,39 @@
         </div>
       </div>
       <div class="form-group">
+        <label for="inputBrightness" class="col-sm-2 control-label">Brightness</label>
+        <div class="col-sm-6">
+          <div class="input-group">
+            <span class="input-group-addon" id="spanBrightness">128</span>
+            <input class="form-control" id="inputBrightness" type="range" step="1" min="0" max="255" />
+          </div>
+        </div>
+      </div>
+      <div class="form-group" id="wrapperHueSpeed">
+        <label for="inputHueSpeed" class="col-sm-2 control-label">Hue Speed</label>
+        <div class="col-sm-6">
+          <div class="input-group">
+            <span class="input-group-addon" id="spanHueSpeed">1</span>
+            <input class="form-control" id="inputHueSpeed" type="range" step="1" min="0" max="255" />
+          </div>
+        </div>
+      </div>
+      <div class="form-group" id="wrapperPaletteSpeed">
+        <label for="inputPaletteSpeed" class="col-sm-2 control-label">Palette Duration</label>
+        <div class="col-sm-6">
+          <div class="input-group">
+            <span class="input-group-addon" id="spanPaletteSpeed">1</span>
+            <input class="form-control" id="inputPaletteSpeed" type="range" step="1" min="1" max="10" />
+          </div>
+        </div>
+      </div>
+      <div class="form-group" id="wrapperColorWheel">
         <label for="inputColor" class="col-sm-2 control-label">Color</label>
         <div class="col-sm-6">
           <input id="inputColor" type="text" class="form-control">
         </div>
       </div>
-      <div class="form-group">
+      <div class="form-group" id="wrapperColorPicker">
         <div class="col-sm-6 col-sm-offset-2">
           <div class="btn-group btn-group-justified" role="group" id="colors"></div>
         </div>

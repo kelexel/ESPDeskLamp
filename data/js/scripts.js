@@ -6,7 +6,8 @@
 var urlBase = ""; // used when hosting the site on the ESP8266
 
 var brightnessTimer = {};
-var speedTimer = {};
+var hueSpeedTimer = {};
+var paletteSpeedTimer = {};
 var colorTimer = {};
 
 var ignoreColorChange = true;
@@ -25,7 +26,7 @@ var colors = [
   {l: 'Violet', c: '#8000FF'},
   {l: 'Magenta', c: '#FF00FF'},
   {l: 'Rose', c: '#FF0080'}
-]
+];
 var cnt = $('#colors');
 var div;
 colors.forEach(function(itm) {
@@ -71,9 +72,14 @@ $("#inputSpeed").on("change mousemove", function() {
    $("#spanSpeed").html($(this).val());
 });
 
-$("#inputSpeed").on("change", function() {
-   $("#spanSpeed").html($(this).val());
-   delaySetSpeed();
+$("#inputHueSpeed").on("change", function() {
+   $("#spanHueSpeed").html($(this).val());
+   delaySetHueSpeed();
+});
+
+$("#inputPaletteSpeed").on("change", function() {
+   $("#spanPaletteSpeed").html($(this).val());
+   delaySetPaletteSpeed();
 });
 
 $("#inputPattern").change(function() {
@@ -84,19 +90,24 @@ $("#inputColor").change(function() {
   if(ignoreColorChange) return;
 
   var rgb = $("#inputColor").minicolors('rgbObject');
-  delaySetColor(rgb);
+  // delaySetColor(rgb);
+  var hexString = rgbToHex(rgb.r, rgb.g, rgb.b);
+  delaySetColor('hex', hexString);
+
 });
 
 $(".btn-color").click(function() {
-  console.log('A')
+  // console.log('A')
   if(ignoreColorChange) return;
-  console.log('B')
+  // console.log('B')
 
   var rgb = $(this).css('backgroundColor');
   var components = rgbToComponents(rgb);
-  delaySetColor(components);
+  // delaySetColor('rgb', components);
 
   var hexString = rgbToHex(components.r, components.g, components.b);
+  delaySetColor('hex', hexString);
+
   ignoreColorChange = true;
   $("#inputColor").minicolors('value', hexString);
   ignoreColorChange = false;
@@ -109,7 +120,10 @@ function getAll() {
     $("#status").html("Connecting...");
     $("#inputBrightness").val(data.brightness);
     $("#spanBrightness").html(data.brightness);
-    if (data.speed) $("#inputSpeed").val(data.speed);
+    if (data.hueSpeed) $("#inputHueSpeed").val(data.hueSpeed);
+    else console.log('no hueSpeed')
+    if (data.paletteSpeed) $("#inputPaletteSpeed").val(data.paletteSpeed);
+    else console.log('no paletteSpeed')
 
     var hexString = rgbToHex(data.solidColor.r, data.solidColor.g, data.solidColor.b);
     ignoreColorChange = true;
@@ -126,6 +140,7 @@ function getAll() {
     }
 
     $("#inputPattern").val(data.currentPattern.index);
+    processPattern(data.currentPattern.index);
 
     $("#status").html("Ready");
   });
@@ -161,38 +176,73 @@ function setBrightness(value) {
   });
 }
 
-function delaySetSpeed() {
-    clearTimeout(speedTimer);
-    speedTimer = setTimeout(function() {
-      setSpeed($("#inputSpeed").val());
+function delaySetHueSpeed() {
+    clearTimeout(hueSpeedTimer);
+    hueSpeedTimer = setTimeout(function() {
+      setHueSpeed($("#inputHueSpeed").val());
+    }, 300);
+}
+function delaySetPaletteSpeed() {
+    clearTimeout(paletteSpeedTimer);
+    paletteSpeedTimer = setTimeout(function() {
+      setPaletteSpeed($("#inputPaletteSpeed").val());
     }, 300);
 }
 
-function setSpeed(value) {
-  $.post(urlBase + "speed?value=" + value, function(data) {
-    $("#status").html("Set Speed: " + data);
+function setHueSpeed(value) {
+  $.post(urlBase + "speed?type=hue&value=" + value, function(data) {
+    $("#status").html("Set Hue Speed: " + data);
   });
 }
 
+function setPaletteSpeed(value) {
+  $.post(urlBase + "speed?type=palette&value=" + value, function(data) {
+    $("#status").html("Set Palette Speed: " + data);
+  });
+}
+
+function processPattern(p) {
+  if (p == 0) {
+    $("#wrapperHueSpeed").css('display', 'none');
+    $("#wrapperPaletteSpeed").css('display', 'none');
+    $("#wrapperColorWheel").css('display', 'inherit');
+    $("#wrapperColorPicker").css('display', 'inherit');
+    // $("#wrapperPaletteSpeed").styles.display = 'none';
+    // $("#wrapperColorWheel").styles.display = 'inherit';
+    // $("#wrapperColorPicker").styles.display = 'inherit';
+  } else {
+    $("#wrapperHueSpeed").css('display', 'inherit');
+    $("#wrapperPaletteSpeed").css('display', 'inherit');
+    $("#wrapperColorWheel").css('display', 'none');
+    $("#wrapperColorPicker").css('display', 'none');
+  }
+}
 function setPattern(value) {
   $.post(urlBase + "pattern?value=" + value, function(data) {
+    processPattern(value);
     $("#status").html("Set Pattern: " + data.name);
   });
 }
 
-function delaySetColor(value) {
+function delaySetColor(colorType, value) {
   clearTimeout(colorTimer);
   colorTimer = setTimeout(function() {
-    setColor(value);
+    setColor(colorType, value);
   }, 300);
 }
 
-function setColor(value) {
-  console.log('KILI')
-  $.post(urlBase + "solidColor?r=" + value.r + "&g=" + value.g + "&b=" + value.b, function(data) {
+function setColor(colorType, value) {
+  // console.log('set', colorType, value)
+  if (colorType == "rgb") {
+    $.post(urlBase + "solidColor?r=" + value.r + "&g=" + value.g + "&b=" + value.b, function(data) {
     $("#status").html("Set Color: rgb(" + data.r + ", " + data.g + ", " + data.b + ")");
-    $("#inputPattern").val(allData.patterns.length - 1);
-  });
+    });
+ } else {
+    $.post(urlBase + "color?value=" + value.replace('#', ''), function(data) {
+      $("#status").html("Set Color: hex(" + value + ")");
+    });
+  }
+  $("#inputPattern").val(0);
 }
 
 function componentToHex(c) {

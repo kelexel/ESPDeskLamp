@@ -5,8 +5,9 @@ extern "C" {
 }
 
 /*
-* esp8266-fastled-async-webserver
+* ESPDeskLamp (aka esp8266-fastled-async-webserver)
 * A humble attempt at porting esp8266-fastled-webserver to ESPAsyncWebServer + MQTT support
+* Copyright (c) 2016 Rudolph Sand (kelexel@github)
 *
 * Based upon:
 * ESP8266 + FastLED + IR Remote + MSGEQ7: https://github.com/jasoncoon/esp8266-fastled-webserver
@@ -128,6 +129,7 @@ void setup() {
   leddriver.setup();
   webdriver.setRoutes();
   webdriver.begin();
+  Serial.print(leddriver.getStatus());
 }
 
 void loop() {
