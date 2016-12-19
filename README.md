@@ -47,6 +47,8 @@ A crash course into C++, and Classes
 
 Changelog:
 ----------
+* v1.3
+  * Fixed Wifi AP mode
 
 * v1.2
   * Found the reason for random crashes, and fixed it
