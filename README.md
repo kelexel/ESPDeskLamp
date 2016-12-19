@@ -94,6 +94,8 @@ Install the following libraries using `pio lib update`
 You might want to edit ESPLedDriver.h to specify which PIN is hooked to the LEDs (see `DATA_PIN`).
 You might also want to edit the number of LEDs in the same file (see `NUM_LEDS`)
 
+Edit platformio.ini, select, or add, your board in there.
+
 Than build and flash.
 
 

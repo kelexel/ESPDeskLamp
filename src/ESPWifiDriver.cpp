@@ -18,8 +18,10 @@ String ESPWifiDriver::formatHostname(const String hostname) {
   return hostname + macID;
 }
 void ESPWifiDriver::setupAP(const char* apWifiPSK){
-  WiFi.hostname(_hostname);
   WiFi.mode(WIFI_AP);
+
+  uint8_t mac[WL_MAC_ADDR_LENGTH];
+  WiFi.softAPmacAddress(mac);
 
   String AP_NameString = _hostname;
 
@@ -29,8 +31,10 @@ void ESPWifiDriver::setupAP(const char* apWifiPSK){
   for (int i = 0; i < AP_NameString.length(); i++)
     AP_NameChar[i] = AP_NameString.charAt(i);
 
+    // boolean localAPAndServerStarted = WiFi.startLocalAPAndServer(AP_NameChar, apWifiPSK, "11", "8080");
   WiFi.softAP(AP_NameChar, apWifiPSK);
-  WiFi.begin();
+  // WiFi.printDiag(Serial);
+  
 }
 
 void ESPWifiDriver::setupClientNetwork(IPAddress ip, IPAddress g, IPAddress n) {

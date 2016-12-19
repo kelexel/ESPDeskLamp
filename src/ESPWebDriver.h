@@ -22,6 +22,7 @@ class ESPWebDriver
     void LampPaletteHandler(AsyncWebServerRequest *request);
     void LampDelayHandler(AsyncWebServerRequest *request);
   private:
+    // AsyncWebServer* _server;
     ESPFastLedDriver* _ledDriver;
 };
 
